@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  .container
+    .file(class={ file: icon !== 'aocticon-file-media'})
+      .file-header
+        span.header-title
+          span.octicon(class=icon)
+          |  #{title}
+        if icon === 'octicon-file'
+          .file-actions
+            a(href="").muted-link
+              span.octicon.octicon-pencil
+              |  Edit
+      .readme.instapaper_body
+        div(class={ 'markdown-body': icon !== 'octicon-file-media'}) !{content}

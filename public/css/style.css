@@ -1,0 +1,52 @@
+body {
+  min-width: 0;
+}
+
+.container {
+  width: auto;
+  max-width: 980px;
+}
+
+.boxed-group {
+  margin-top: 20px;
+}
+
+.header-title {
+  font-weight: 600;
+}
+
+.file > h3 {
+  border: none;
+}
+
+.header-logo-invertocat {
+  height: 28px;
+  margin-top: -1px;
+}
+
+.inline-wrapper {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
+.site-footer {
+  margin-top: 20px;
+  padding: 20px 0;
+}
+
+@media screen and (max-width: 1020px) {
+  .container {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .header-search {
+    width: 200px;
+  }
+  .header-nav {
+    display: none;
+  }
+}

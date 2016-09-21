@@ -1,0 +1,42 @@
+{
+  "name": "mdds",
+  "version": "1.0.0",
+  "description": "Simple web server allowing to browse, search and edit project documentation written in Markdown",
+  "repository": "http://github.com/sinedied/mdds",
+  "keywords": [
+    "markdown",
+    "gfm",
+    "server",
+    "local",
+    "offline",
+    "doc",
+    "documentation",
+    "knowledgebase",
+    "wiki",
+    "nodejs"
+  ],
+  "author": "Yohan Lasorsa",
+  "license": "MIT",
+  "homepage": "http://github.com/sinedied/mdds",
+  "main": "mdds.js",
+  "scripts": {
+    "start": "node mdds.js -o"
+  },
+  "bin": {
+    "mdds": "./bin/mdds"
+  },
+  "engines": {
+    "node": "4"
+  },
+  "dependencies": {
+    "express": "^4.14.0",
+    "highlight.js": "^9.7.0",
+    "lodash": "^4.16.1",
+    "marked": "^0.3.6",
+    "octicons": "^4.4.0",
+    "open": "^0.0.5",
+    "optimist": "^0.6.1",
+    "pug": "^2.0.0-beta6"
+  },
+  "devDependencies": {}
+}
