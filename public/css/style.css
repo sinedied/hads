@@ -35,6 +35,10 @@ body {
   padding: 20px 0;
 }
 
+.ace_editor {
+  height: calc(100vh - 200px);
+}
+
 @media screen and (max-width: 1020px) {
   .container {
     margin-left: 20px;

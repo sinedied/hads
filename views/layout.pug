@@ -1,17 +1,14 @@
 doctype html
 html
   head
-    meta(charset="utf-8")
+    meta(charset='utf-8')
     title #{title}
     each style in styles
       link(href=style, rel='stylesheet', type='text/css')
   body
     include header
     block content
-    .container
-      .site-footer
-        ul.site-footer-links
-          li
-            span.octicon.octicon-rocket
-            |  Powered by&#32;
-            a(href=pkg.homepage) mdds #{pkg.version}
+    include footer
+    each script in scripts
+      script(src=script)
+

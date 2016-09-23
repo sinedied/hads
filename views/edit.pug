@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  .container
+    .file
+      .file-header
+        span.header-title
+          span.octicon(class=icon)
+          |  #{title}
+        if icon === 'octicon-file'
+          .file-actions
+            a(href='#' onclick='mdds.save()').muted-link
+              span.octicon.octicon-check
+              |  Save
+      .readme.instapaper_body
+        #editor.markdown-body !{content}
+        form#form(method='post' action=route)
+          input#content(type='hidden' name='content')

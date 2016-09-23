@@ -4,6 +4,7 @@ let fs = require('fs');
 let path = require('path');
 let optimist = require('optimist');
 let express = require('express');
+let bodyParser = require('body-parser');
 let highlight = require('highlight.js');
 let marked = require('marked');
 let _ = require('lodash');
@@ -34,9 +35,12 @@ let app = express();
 
 app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'pug');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '/public')));
 app.use('/css/highlight/', express.static(path.join(__dirname, 'node_modules/highlight.js/styles')));
 app.use('/css/octicons/', express.static(path.join(__dirname, 'node_modules/octicons/build/font')));
+app.use('/js/ace/', express.static(path.join(__dirname, 'node_modules/ace-builds/src-min/')));
 
 const ROOT_FILES = ['index.md', 'README.md', 'readme.md'];
 const MARKDOWN_EXTENSIONS = ['md', 'markdown'];
@@ -44,12 +48,14 @@ const IMAGES_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'];
 const SOURCE_CODE_EXTENSIONS = ['js', 'json', 'ts', 'coffee', 'css', 'scss', 'sass', 'less', 'stylus', 'html', 'jade',
   'pug', 'sh', 'txt'];
 const STYLESHEETS = ['/css/highlight/github.css', 'css/octicons/octicons.css', '/css/github.css', '/css/style.css'];
+const SCRIPTS = ['/js/ace/ace.js', 'js/client.js'];
 
 app.get('*', (req, res, next) => {
   let route = Helpers.extractRoute(req.path);
   let query = req.query || {};
   let content = null;
   let rootIndex = -1;
+  let edit = query.edit && JSON.parse(query.edit);
   let filePath, stat, icon;
 
   while(1) {
@@ -58,8 +64,8 @@ app.get('*', (req, res, next) => {
       stat = fs.statSync(filePath);
       if (stat.isDirectory()) {
         // Try to find a root file
-        ++rootIndex;
-        throw 'Folder found';
+        route = ROOT_FILES[++rootIndex];
+        continue;
       }
       break;
     } catch(e) {
@@ -75,7 +81,7 @@ app.get('*', (req, res, next) => {
     // Access raw content: images, code, etc
     return res.sendFile(filePath);
   } else if (Matcher.isMarkdown(filePath)) {
-    content = Renderer.renderFile(filePath);
+    content = edit ? fs.readFileSync(filePath, 'utf8') : Renderer.renderFile(filePath);
     icon = 'octicon-file';
   } else if (Matcher.isImage(filePath)) {
     content = Renderer.renderImageFile(route);
@@ -88,12 +94,14 @@ app.get('*', (req, res, next) => {
   }
 
   if (content) {
-    res.render('file', {
-        title: path.basename(filePath),
-        icon: icon,
-        content: content,
-        styles: STYLESHEETS,
-        pkg: pkg
+    res.render(edit ? 'edit' : 'file', {
+      title: path.basename(filePath),
+      route: route,
+      icon: icon,
+      content: content,
+      styles: STYLESHEETS,
+      scripts: SCRIPTS,
+      pkg: pkg
     });
   }
 });
@@ -105,9 +113,17 @@ app.post('*', (req, res, next) => {
 
   try {
     stat = fs.statSync(filePath);
-    if (stat.isFile()) {
-      fs.writeFileSync(filePath, req.body);
-      res.json({ success: true });
+    if (stat.isFile() && req.body.content) {
+      fs.writeFileSync(filePath, req.body.content);
+      res.render('file', {
+        title: path.basename(filePath),
+        route: route,
+        icon: 'octicon-file',
+        content: Renderer.renderFile(filePath),
+        styles: STYLESHEETS,
+        scripts: SCRIPTS,
+        pkg: pkg
+      });
     }
   } catch(e) {
     return next();
@@ -151,7 +167,7 @@ class Renderer {
   }
 
   static renderImageFile(file) {
-    return `<div class="image"><span class="border-wrap"><img src="${file}?raw=true"></span></div>`;
+    return `<div class="image"><span class="border-wrap"><img src="${file}?raw=1"></span></div>`;
   }
 
   static renderSourceCode(file, lang) {

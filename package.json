@@ -9,6 +9,8 @@
     "server",
     "local",
     "offline",
+    "search",
+    "edit",
     "doc",
     "documentation",
     "knowledgebase",
@@ -26,9 +28,11 @@
     "mdds": "./bin/mdds"
   },
   "engines": {
-    "node": "4"
+    "node": ">=4"
   },
   "dependencies": {
+    "ace-builds": "^1.2.5",
+    "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "highlight.js": "^9.7.0",
     "lodash": "^4.16.1",
