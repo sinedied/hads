@@ -15,6 +15,7 @@
     "documentation",
     "knowledgebase",
     "wiki",
+    "search",
     "nodejs"
   ],
   "author": "Yohan Lasorsa",
@@ -28,11 +29,13 @@
     "mdds": "./bin/mdds"
   },
   "engines": {
-    "node": ">=4"
+    "node": ">=4.0.0"
   },
   "dependencies": {
     "ace-builds": "^1.2.5",
+    "bluebird": "^3.4.6",
     "body-parser": "^1.15.2",
+    "elasticlunr": "^0.9.5",
     "express": "^4.14.0",
     "highlight.js": "^9.7.0",
     "lodash": "^4.16.1",
@@ -40,7 +43,10 @@
     "octicons": "^4.4.0",
     "open": "^0.0.5",
     "optimist": "^0.6.1",
-    "pug": "^2.0.0-beta6"
+    "pug": "^2.0.0-beta6",
+    "recursive-readdir": "^2.1.0",
+    "remove-markdown": "^0.1.0",
+    "string-humanize": "^1.0.0"
   },
   "devDependencies": {}
 }

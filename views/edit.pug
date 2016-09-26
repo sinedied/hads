@@ -13,6 +13,6 @@ block content
               span.octicon.octicon-check
               |  Save
       .readme.instapaper_body
-        #editor.markdown-body !{content}
+        #editor.hidden.markdown-body !{content}
         form#form(method='post' action=route)
           input#content(type='hidden' name='content')

@@ -1,14 +1,16 @@
 'use strict';
 
-let fs = require('fs');
+let Promise = require('bluebird');
+let fs = Promise.promisifyAll(require('fs'));
 let path = require('path');
 let optimist = require('optimist');
 let express = require('express');
 let bodyParser = require('body-parser');
-let highlight = require('highlight.js');
-let marked = require('marked');
-let _ = require('lodash');
 let pkg = require('./package.json');
+let Matcher = require('./lib/matcher.js');
+let Renderer = require('./lib/renderer.js');
+let Helpers = require('./lib/helpers.js');
+let Indexer = require('./lib/indexer.js');
 
 let args = optimist
   .usage(`\n${pkg.name} ${pkg.version}\nUsage: $0 [root dir] [options]`)
@@ -31,168 +33,126 @@ if (args.help || args._.length > 1) {
 
 let docPath = args._[0] || './';
 let rootPath = path.resolve(docPath);
+let indexer = new Indexer(rootPath);
 let app = express();
 
 app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'pug');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '/public')));
-app.use('/css/highlight/', express.static(path.join(__dirname, 'node_modules/highlight.js/styles')));
-app.use('/css/octicons/', express.static(path.join(__dirname, 'node_modules/octicons/build/font')));
-app.use('/js/ace/', express.static(path.join(__dirname, 'node_modules/ace-builds/src-min/')));
+app.use('/_mdds/', express.static(path.join(__dirname, '/public')));
+app.use('/_mdds/highlight/', express.static(path.join(__dirname, 'node_modules/highlight.js/styles')));
+app.use('/_mdds/octicons/', express.static(path.join(__dirname, 'node_modules/octicons/build/font')));
+app.use('/_mdds/ace/', express.static(path.join(__dirname, 'node_modules/ace-builds/src-min/')));
 
 const ROOT_FILES = ['index.md', 'README.md', 'readme.md'];
-const MARKDOWN_EXTENSIONS = ['md', 'markdown'];
-const IMAGES_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'];
-const SOURCE_CODE_EXTENSIONS = ['js', 'json', 'ts', 'coffee', 'css', 'scss', 'sass', 'less', 'stylus', 'html', 'jade',
-  'pug', 'sh', 'txt'];
-const STYLESHEETS = ['/css/highlight/github.css', 'css/octicons/octicons.css', '/css/github.css', '/css/style.css'];
-const SCRIPTS = ['/js/ace/ace.js', 'js/client.js'];
+const STYLESHEETS = ['/_mdds/highlight/github.css', '/_mdds/octicons/octicons.css', '/_mdds/css/github.css',
+  '/_mdds/css/style.css'];
+const SCRIPTS = ['/_mdds/ace/ace.js', '/_mdds/js/client.js'];
 
 app.get('*', (req, res, next) => {
   let route = Helpers.extractRoute(req.path);
   let query = req.query || {};
-  let content = null;
   let rootIndex = -1;
   let edit = query.edit && JSON.parse(query.edit);
-  let filePath, stat, icon;
+  let filePath, icon, search;
 
-  while(1) {
-    try {
-      filePath = path.join(rootPath, route);
-      stat = fs.statSync(filePath);
-      if (stat.isDirectory()) {
-        // Try to find a root file
-        route = ROOT_FILES[++rootIndex];
-        continue;
-      }
-      break;
-    } catch(e) {
-      if (rootIndex !== -1 && rootIndex < ROOT_FILES.length) {
-        route = ROOT_FILES[rootIndex++];
-      } else {
-        return next();
-      }
-    }
+  function tryProcessFile() {
+    let contentPromise = null;
+    filePath = path.join(rootPath, route);
+
+    return fs.statAsync(filePath)
+      .then((stat) => {
+        search = query.search && query.search.length > 0 ? query.search : null;
+
+        if (stat.isDirectory() && !search) {
+          // Try to find a root file
+          route = path.join(route, ROOT_FILES[++rootIndex]);
+          return tryProcessFile();
+        }
+
+        if (query.raw && JSON.parse(query.raw)) {
+          // Access raw content: images, code, etc
+          return res.sendFile(filePath);
+        } else if (search) {
+          contentPromise = Renderer.renderSearch(indexer, query.search);
+          icon = 'octicon-search';
+        } else if (Matcher.isMarkdown(filePath)) {
+          contentPromise = edit ? Renderer.renderRaw(filePath) : Renderer.renderFile(filePath);
+          icon = 'octicon-file';
+        } else if (Matcher.isImage(filePath)) {
+          contentPromise = Renderer.renderImageFile(route);
+          icon = 'octicon-file-media';
+        } else if (Matcher.isSourceCode(filePath)) {
+          contentPromise = Renderer.renderSourceCode(filePath, path.extname(filePath).replace('.', ''));
+          icon = 'octicon-file-code';
+        }
+
+        if (contentPromise) {
+          return contentPromise.then((content) => {
+            res.render(edit ? 'edit' : 'file', {
+              title: search ? 'Search results' : path.basename(filePath),
+              route: route,
+              icon: icon,
+              search: search,
+              content: content,
+              styles: STYLESHEETS,
+              scripts: SCRIPTS,
+              pkg: pkg
+            });
+          });
+        } else {
+          next();
+        }
+      })
+      .catch(() => {
+        if (rootIndex !== -1 && rootIndex < ROOT_FILES.length) {
+          route = path.join(path.dirname(route), ROOT_FILES[rootIndex++]);
+          return tryProcessFile();
+        }
+        next();
+      });
   }
 
-  if (query.raw && JSON.parse(query.raw)) {
-    // Access raw content: images, code, etc
-    return res.sendFile(filePath);
-  } else if (Matcher.isMarkdown(filePath)) {
-    content = edit ? fs.readFileSync(filePath, 'utf8') : Renderer.renderFile(filePath);
-    icon = 'octicon-file';
-  } else if (Matcher.isImage(filePath)) {
-    content = Renderer.renderImageFile(route);
-    icon = 'octicon-file-media';
-  } else if (Matcher.isSourceCode(filePath)) {
-    content = Renderer.renderSourceCode(filePath, path.extname(filePath).replace('.', ''));
-    icon = 'octicon-file-code';
-  } else {
-    return next();
-  }
-
-  if (content) {
-    res.render(edit ? 'edit' : 'file', {
-      title: path.basename(filePath),
-      route: route,
-      icon: icon,
-      content: content,
-      styles: STYLESHEETS,
-      scripts: SCRIPTS,
-      pkg: pkg
-    });
-  }
+  tryProcessFile();
 });
 
 app.post('*', (req, res, next) => {
   let route = Helpers.extractRoute(req.path);
   let filePath = path.join(rootPath, route);
-  let stat;
 
-  try {
-    stat = fs.statSync(filePath);
-    if (stat.isFile() && req.body.content) {
-      fs.writeFileSync(filePath, req.body.content);
+  fs.statAsync(filePath)
+    .then((stat) => {
+      if (stat.isFile() && req.body.content) {
+        return fs.writeFileAsync(filePath, req.body.content);
+      }
+    })
+    .then(() => {
+      return Renderer.renderFile(filePath);
+    })
+    .then((content) => {
       res.render('file', {
         title: path.basename(filePath),
         route: route,
         icon: 'octicon-file',
-        content: Renderer.renderFile(filePath),
+        content: content,
         styles: STYLESHEETS,
         scripts: SCRIPTS,
         pkg: pkg
       });
+    })
+    .catch(() => {
+      next();
+    })
+});
+
+indexer.indexFiles().then(() => {
+  app.listen(args.port, args.host, () => {
+    let serverUrl = `http://${args.host}:${args.port}`;
+    console.log(`${pkg.name} ${pkg.version} serving at ${serverUrl} (press CTRL+C to exit)`);
+
+    if (args.open) {
+      require('open')(serverUrl);
     }
-  } catch(e) {
-    return next();
-  }
+  });
 });
-
-app.listen(args.port, args.host, () => {
-  let serverUrl = `http://${args.host}:${args.port}`;
-  console.log(`${pkg.name} ${pkg.version} serving at ${serverUrl} (press CTRL+C to exit)`);
-
-  if (args.open) {
-    require('open')(serverUrl);
-  }
-});
-
-class Matcher {
-
-  static isMarkdown(file) {
-    return Matcher._hasExtension(file, MARKDOWN_EXTENSIONS);
-  }
-
-  static isImage(file) {
-    return Matcher._hasExtension(file, IMAGES_EXTENSIONS);
-  }
-
-  static isSourceCode(file) {
-    return Matcher._hasExtension(file, SOURCE_CODE_EXTENSIONS);
-  }
-
-  static _hasExtension(file, extensions) {
-    return _.includes(extensions, path.extname(file).replace('.', ''));
-  }
-
-}
-
-class Renderer {
-
-  static renderFile(file) {
-    let contents = fs.readFileSync(file, 'utf8');
-    return Renderer.renderMarkdown(contents);
-  }
-
-  static renderImageFile(file) {
-    return `<div class="image"><span class="border-wrap"><img src="${file}?raw=1"></span></div>`;
-  }
-
-  static renderSourceCode(file, lang) {
-    let contents = `\`\`\`${lang}\n${fs.readFileSync(file, 'utf8')}\n\`\`\``;
-    return Renderer.renderMarkdown(contents);
-  }
-
-  static renderMarkdown(contents) {
-    marked.setOptions({
-      gfm: true,
-      tables: true,
-      smartLists: true,
-      breaks: true,
-      highlight: (code, lang) => lang && lang !== 'no-highlight' ? highlight.highlight(lang, code, true).value : code
-    });
-
-    return marked(contents);
-  }
-
-}
-
-class Helpers {
-
-  static extractRoute(requestPath) {
-    return path.normalize(decodeURI(requestPath)).replace(/^(\.\.[\/\\])+/, '');
-  }
-
-}

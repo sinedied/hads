@@ -12,5 +12,5 @@ block content
             a(href=`${route}?edit=1`).muted-link
               span.octicon.octicon-pencil
               |  Edit
-      .readme.instapaper_body
+      .readme.instapaper_body(class={ 'search': search })
         div(class={ 'markdown-body': icon !== 'octicon-file-media'}) !{content}
