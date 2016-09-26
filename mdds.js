@@ -92,7 +92,6 @@ app.get('*', (req, res, next) => {
           return contentPromise.then((content) => {
             res.render(edit ? 'edit' : 'file', {
               title: search ? renderer.searchResults : path.basename(filePath),
-              sidebar: renderer.renderSidebar(),
               route: route,
               icon: icon,
               search: search,

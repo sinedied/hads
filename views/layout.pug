@@ -8,10 +8,7 @@ html
       link(href=`/_mdds${style}`, rel='stylesheet', type='text/css')
   body
     include header
-    .columns
-      .column.three-fourths
-        block content
-      include sidebar
+    block content
     include footer
     each script in scripts
       script(src=`/_mdds${script}`)
