@@ -7,7 +7,9 @@ html
       link(href=style, rel='stylesheet', type='text/css')
   body
     include header
-    block content
+    .columns
+      .column.three-fourths
+        block content
     include footer
     each script in scripts
       script(src=script)
