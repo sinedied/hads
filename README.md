@@ -1,6 +1,6 @@
 # Markdown Documentation Server (mdds)
 
-Simple web server allowing to browse, search and edit project documentation written in
+Fast web server allowing to browse, search and edit project documentation written in
 [Markdown](http://daringfireball.net/projects/markdown/).
 
 > TODO: screenshot
@@ -8,9 +8,11 @@ Simple web server allowing to browse, search and edit project documentation writ
 Features:
 
 - **No configuration needed**
-- Automatic navigation menu generation, with possible manual override
 - Github-like presentation
-- GFM ([Github Flavoured Markdown](https://guides.github.com/features/mastering-markdown/)) support
+- GFM ([Github Flavoured Markdown](https://guides.github.com/features/mastering-markdown/))
+- Automatic indexation and search
+- Generated sidebar navigation, with possible override
+- In-browser editor
 
 
 ## Usage
@@ -36,12 +38,14 @@ Options:
 
 If no root dir is specified, `./` will be used.
 
-## Home page
+## Customization
+
+### Home page
  
 The server will automatically search for a file named `index.md`, `readme.md` or `README.md` on the specified
 documentation root and will use it as your home page.
 
-## Navigation
+### Sidebar navigation
 
 > TODO
 

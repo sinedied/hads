@@ -34,6 +34,7 @@ if (args.help || args._.length > 1) {
 let docPath = args._[0] || './';
 let rootPath = path.resolve(docPath);
 let indexer = new Indexer(rootPath);
+let renderer = new Renderer(indexer);
 let app = express();
 
 app.set('views', path.join(__dirname, '/views'));
@@ -46,9 +47,8 @@ app.use('/_mdds/octicons/', express.static(path.join(__dirname, 'node_modules/oc
 app.use('/_mdds/ace/', express.static(path.join(__dirname, 'node_modules/ace-builds/src-min/')));
 
 const ROOT_FILES = ['index.md', 'README.md', 'readme.md'];
-const STYLESHEETS = ['/_mdds/highlight/github.css', '/_mdds/octicons/octicons.css', '/_mdds/css/github.css',
-  '/_mdds/css/style.css'];
-const SCRIPTS = ['/_mdds/ace/ace.js', '/_mdds/js/client.js'];
+const STYLESHEETS = ['/highlight/github.css', '/octicons/octicons.css', '/css/github.css', '/css/style.css'];
+const SCRIPTS = ['/ace/ace.js', '/js/client.js'];
 
 app.get('*', (req, res, next) => {
   let route = Helpers.extractRoute(req.path);
@@ -63,7 +63,7 @@ app.get('*', (req, res, next) => {
 
     return fs.statAsync(filePath)
       .then((stat) => {
-        search = query.search && query.search.length > 0 ? query.search : null;
+        search = query.search && query.search.length > 0 ? query.search.trim() : null;
 
         if (stat.isDirectory() && !search) {
           // Try to find a root file
@@ -75,23 +75,24 @@ app.get('*', (req, res, next) => {
           // Access raw content: images, code, etc
           return res.sendFile(filePath);
         } else if (search) {
-          contentPromise = Renderer.renderSearch(indexer, query.search);
+          contentPromise = renderer.renderSearch(query.search);
           icon = 'octicon-search';
         } else if (Matcher.isMarkdown(filePath)) {
-          contentPromise = edit ? Renderer.renderRaw(filePath) : Renderer.renderFile(filePath);
+          contentPromise = edit ? renderer.renderRaw(filePath) : renderer.renderFile(filePath);
           icon = 'octicon-file';
         } else if (Matcher.isImage(filePath)) {
-          contentPromise = Renderer.renderImageFile(route);
+          contentPromise = renderer.renderImageFile(route);
           icon = 'octicon-file-media';
         } else if (Matcher.isSourceCode(filePath)) {
-          contentPromise = Renderer.renderSourceCode(filePath, path.extname(filePath).replace('.', ''));
+          contentPromise = renderer.renderSourceCode(filePath, path.extname(filePath).replace('.', ''));
           icon = 'octicon-file-code';
         }
 
         if (contentPromise) {
           return contentPromise.then((content) => {
             res.render(edit ? 'edit' : 'file', {
-              title: search ? 'Search results' : path.basename(filePath),
+              title: search ? renderer.searchResults : path.basename(filePath),
+              sidebar: renderer.renderSidebar(),
               route: route,
               icon: icon,
               search: search,
@@ -128,7 +129,8 @@ app.post('*', (req, res, next) => {
       }
     })
     .then(() => {
-      return Renderer.renderFile(filePath);
+      indexer.updateIndexForFile(filePath);
+      return renderer.renderFile(filePath);
     })
     .then((content) => {
       res.render('file', {
