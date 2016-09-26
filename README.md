@@ -11,7 +11,7 @@ Features:
 - Github-like presentation
 - GFM ([Github Flavoured Markdown](https://guides.github.com/features/mastering-markdown/))
 - Automatic indexation and search
-- Generated sidebar navigation, with possible override
+- Navigation index generation using Markdown extension `[[index]]`
 - In-browser editor
 
 
@@ -45,9 +45,13 @@ If no root dir is specified, `./` will be used.
 The server will automatically search for a file named `index.md`, `readme.md` or `README.md` on the specified
 documentation root and will use it as your home page.
 
-### Sidebar navigation
+### Navigation index
 
-> TODO
+If you insert the text `[[index]]` in any of your markdown files, it will be replaced by the full navigation index of
+the markdown files found under the specified *root dir*. The file and folder names will be automatically *humanized*
+for better readability.
+
+It is particularly useful on home page to provide an overview of the available documentation for your project.
 
 ## License
 
