@@ -38,7 +38,7 @@ Options:
 
 If no root dir is specified, `./` will be used.
 
-## Customization
+## Extras
 
 ### Home page
  
