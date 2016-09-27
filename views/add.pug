@@ -1,0 +1,11 @@
+#add-modal.hidden
+  .boxed-group
+    h3 Add new file
+      button.octicon.octicon-x.float-right.close-button(onclick='mdds.closeAdd()')
+    form.boxed-group-inner(onsubmit='mdds.add(this.file); return false')
+      p
+        label(for='add') File name
+      p
+        input.form-control#add(name='file', type='text', placeholder='my-folder/my-file.md', required)
+        | &nbsp;
+        button.btn(type='submit') Create

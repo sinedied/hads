@@ -1,27 +1,44 @@
-window.mdds = (function(){
+window.mdds = (function () {
   'use strict';
 
   var editor = null;
+  var byId = document.getElementById.bind(document);
 
-  function init() {
-    var editorElem = document.getElementById('editor');
+  window.onload = function () {
+    var editorElem = byId('editor');
     if (editorElem) {
       editor = ace.edit('editor');
-      editor.setTheme("ace/theme/clouds");
-      editor.getSession().setMode("ace/mode/markdown");
+      editor.setTheme('ace/theme/clouds');
+      editor.getSession().setMode('ace/mode/markdown');
     }
-  }
 
-  function save() {
-    if (editor) {
-      document.getElementById('content').value = editor.getValue();
-      document.getElementById('form').submit();
-    }
-  }
-
-  window.onload = init;
+    document.addEventListener('click', function (e) {
+      if (e.target.id === 'add-modal')
+        window.mdds.closeAdd();
+    }, false);
+    document.addEventListener('keydown', function (e) {
+      if (e.keyCode === 27)
+        window.mdds.closeAdd();
+    }, false);
+  };
 
   return {
-    save: save
+    save: function () {
+      if (editor) {
+        byId('content').value = editor.getValue();
+        byId('form').submit();
+      }
+    },
+    showAdd: function () {
+      byId('add-modal').className = '';
+      byId('add').focus();
+    },
+    closeAdd: function () {
+      byId('add-modal').className = 'hidden';
+    },
+    add: function (file) {
+      this.closeAdd();
+      window.location = '/' + file + '?create=1';
+    }
   }
 })();

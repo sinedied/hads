@@ -7,8 +7,8 @@
         .inline-wrapper
           label.form-control.header-search-wrapper
             input.form-control.header-search-input(type='search', name='search', placeholder='Search', value=search)
-    //ul.header-nav.float-right
-    //  li.header-nav-item
-    //    a.header-nav-link(href="/?new=1")
-    //      span.octicon.octicon-plus
-    //      | Add
+    ul.header-nav.float-right
+      li.header-nav-item
+        button.btn-link.header-nav-link(onclick='mdds.showAdd()')
+          span.octicon.octicon-plus
+          | Add

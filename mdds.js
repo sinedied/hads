@@ -40,7 +40,7 @@ let app = express();
 app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'pug');
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use('/_mdds/', express.static(path.join(__dirname, '/public')));
 app.use('/_mdds/highlight/', express.static(path.join(__dirname, 'node_modules/highlight.js/styles')));
 app.use('/_mdds/octicons/', express.static(path.join(__dirname, 'node_modules/octicons/build/font')));
@@ -55,7 +55,7 @@ app.get('*', (req, res, next) => {
   let query = req.query || {};
   let rootIndex = -1;
   let edit = query.edit && JSON.parse(query.edit);
-  let filePath, icon, search;
+  let filePath, icon, search, error, title;
 
   function tryProcessFile() {
     let contentPromise = null;
@@ -65,18 +65,21 @@ app.get('*', (req, res, next) => {
       .then((stat) => {
         search = query.search && query.search.length > 0 ? query.search.trim() : null;
 
-        if (stat.isDirectory() && !search) {
+        if (stat.isDirectory() && !search && !error) {
           // Try to find a root file
           route = path.join(route, ROOT_FILES[++rootIndex]);
           return tryProcessFile();
         }
 
-        if (query.raw && JSON.parse(query.raw)) {
-          // Access raw content: images, code, etc
-          return res.sendFile(filePath);
+        if (error) {
+          contentPromise = Promise.resolve(Renderer.renderMarkdown(error));
+          icon = 'octicon-alert';
         } else if (search) {
           contentPromise = renderer.renderSearch(query.search);
           icon = 'octicon-search';
+        } else if (query.raw && JSON.parse(query.raw)) {
+          // Access raw content: images, code, etc
+          return res.sendFile(filePath);
         } else if (Matcher.isMarkdown(filePath)) {
           contentPromise = edit ? renderer.renderRaw(filePath) : renderer.renderFile(filePath);
           icon = 'octicon-file';
@@ -88,10 +91,14 @@ app.get('*', (req, res, next) => {
           icon = 'octicon-file-code';
         }
 
+        if (!title) {
+          title = search ? renderer.searchResults : path.basename(filePath);
+        }
+
         if (contentPromise) {
           return contentPromise.then((content) => {
             res.render(edit ? 'edit' : 'file', {
-              title: search ? renderer.searchResults : path.basename(filePath),
+              title: title,
               route: route,
               icon: icon,
               search: search,
@@ -108,9 +115,12 @@ app.get('*', (req, res, next) => {
       .catch(() => {
         if (rootIndex !== -1 && rootIndex < ROOT_FILES.length) {
           route = path.join(path.dirname(route), ROOT_FILES[rootIndex++]);
-          return tryProcessFile();
+        } else {
+          route = '/';
+          title = '404 Error';
+          error = '## File not found ¯\\\\\\_(◕\\_\\_◕)_/¯\n> *There\'s a glitch in the matrix...*';
         }
-        next();
+        return tryProcessFile();
       });
   }
 

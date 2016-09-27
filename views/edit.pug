@@ -4,14 +4,14 @@ block content
   .container
     .file
       .file-header
-        span.header-title
-          span.octicon(class=icon)
-          |  #{title}
         if icon === 'octicon-file'
           .file-actions
             a(href='#' onclick='mdds.save()').muted-link
               span.octicon.octicon-check
               |  Save
+        span.header-title
+            span.octicon(class=icon)
+            |  #{title}
       .readme.instapaper_body
         #editor.hidden.markdown-body !{content}
         form#form(method='post' action=route)

@@ -48,6 +48,23 @@ body {
   font-size: 85%;
 }
 
+#add-modal {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,.6);
+}
+
+#add-modal > .boxed-group {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+
 @media screen and (max-width: 1020px) {
   .container {
     margin-left: 20px;
