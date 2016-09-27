@@ -2,7 +2,10 @@
   "name": "mdds",
   "version": "1.0.0",
   "description": "Simple web server allowing to browse, search and edit project documentation written in Markdown",
-  "repository": "http://github.com/sinedied/mdds",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sinedied/mdds.git"
+  },
   "keywords": [
     "markdown",
     "gfm",
@@ -20,7 +23,10 @@
   ],
   "author": "Yohan Lasorsa",
   "license": "MIT",
-  "homepage": "http://github.com/sinedied/mdds",
+  "homepage": "https://github.com/sinedied/mdds",
+  "bugs": {
+    "url": "https://github.com/sinedied/mdds/issues"
+  },
   "main": "mdds.js",
   "scripts": {
     "start": "node mdds.js -o"
