@@ -48,8 +48,8 @@ documentation root and will use it as your home page.
 ### Navigation index
 
 If you insert the text `[[index]]` in any of your markdown files, it will be replaced by the full navigation index of
-the markdown files found under the specified *root dir*. The file and folder names will be automatically *humanized*
-for better readability.
+the markdown files found under the specified *root dir*. File and folder names will be automatically *humanized* for
+better readability.
 
 It is particularly useful on home page to provide an overview of the available documentation for your project.
 

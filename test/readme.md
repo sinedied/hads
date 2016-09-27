@@ -7,3 +7,9 @@ You can try accessing one of these test links:
 - [Markdown cheatsheet](cheatsheet.md)
 - [Image](md.png)
 - [Source file](code.js)
+
+***
+
+You can also navigate using the generated index below:
+
+[[index]]
