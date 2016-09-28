@@ -1,6 +1,13 @@
 # Hey it's Another Documentation Server! (hads)
 
-Fast local web server to browse, search and edit project documentation written in
+[![NPM version](https://img.shields.io/npm/v/hads.svg)](https://www.npmjs.com/package/hads)
+![Node version](https://img.shields.io/node/v/hads.svg)
+[![Dependency Status](https://img.shields.io/david/sinedied/hads.svg)](https://david-dm.org/sinedied/hads)
+[![License](https://img.shields.io/npm/l/hads.svg)](LICENSE)
+
+##### *The master of ~~hell~~ docs*
+
+> Fast web server allowing to browse, search and edit project documentation written in
 [Markdown](http://daringfireball.net/projects/markdown/).
 
 
@@ -54,7 +61,3 @@ the markdown files found under the specified *root dir*. File and folder names w
 better readability.
 
 It is particularly useful on home page to provide an overview of the available documentation for your project.
-
-## License
-
-[MIT](LICENSE)
