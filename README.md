@@ -5,9 +5,9 @@
 [![Dependency Status](https://img.shields.io/david/sinedied/hads.svg)](https://david-dm.org/sinedied/hads)
 [![License](https://img.shields.io/npm/l/hads.svg)](LICENSE)
 
-##### *The master of ~~hell~~ docs*
+### *The master of ~~hell~~ docs*
 
-> Fast web server allowing to browse, search and edit project documentation written in
+> **Hads** is a fast Node.js based web server allowing to browse, search and edit project documentation written in
 [Markdown](http://daringfireball.net/projects/markdown/).
 
 
@@ -21,7 +21,7 @@
 - Automatic indexation and search
 - Navigation index generation using Markdown extension `[[index]]`
 - In-browser editor
-- Works 100% offline
+- 100% offline
 
 
 ## Usage
