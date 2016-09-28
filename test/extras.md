@@ -5,9 +5,8 @@
 An index should be inserted below:
 [[index]]
 
-but not here: `[[index]]`
-
-and not here:
+But not here: `[[index]]`
+And here:
 ```
 [[index]]
 ```
@@ -18,19 +17,19 @@ and not here:
 
 ```mermaid
 graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
+    A[Hard edge] -->|Link text| B(Round edge);
+    B --> C{Decision};
+    C -->|One| D[Result one];
+    C -->|Two| E[Result two];
 ```
 
 Source:
 ```
 graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
+    A[Hard edge] -->|Link text| B(Round edge);
+    B --> C{Decision};
+    C -->|One| D[Result one];
+    C -->|Two| E[Result two];
 ```
 
 ### Sequence diagram:
@@ -42,7 +41,7 @@ sequenceDiagram
     loop Healthcheck
         John->John: Fight against hypochondria
     end
-    Note right of John: Rational thoughts <br/>prevail...
+    Note right of John: Rational thoughts prevail...
     John-->Alice: Great!
     John->Bob: How about you?
     Bob-->John: Jolly good!
@@ -57,7 +56,7 @@ sequenceDiagram
     loop Healthcheck
         John->John: Fight against hypochondria
     end
-    Note right of John: Rational thoughts <br/>prevail...
+    Note right of John: Rational thoughts prevail...
     John-->Alice: Great!
     John->Bob: How about you?
     Bob-->John: Jolly good!
