@@ -77,3 +77,22 @@ body {
     width: 200px;
   }
 }
+
+@media print {
+  .container {
+    max-width: none;
+  }
+  .boxed-group {
+    margin: 0;
+  }
+  .header, .site-footer, .file-header {
+    display: none;
+  }
+  .file {
+    border: 0;
+    margin: 0;
+  }
+  .markdown-body {
+    padding: 0 !important;
+  }
+}
