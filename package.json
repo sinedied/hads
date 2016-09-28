@@ -1,6 +1,6 @@
 {
   "name": "mdds",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple web server allowing to browse, search and edit project documentation written in Markdown",
   "repository": {
     "type": "git",
@@ -46,6 +46,7 @@
     "highlight.js": "^9.7.0",
     "lodash": "^4.16.1",
     "marked": "^0.3.6",
+    "mkdirp": "^0.5.1",
     "octicons": "^4.4.0",
     "open": "^0.0.5",
     "optimist": "^0.6.1",

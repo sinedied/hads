@@ -3,7 +3,7 @@
 Fast web server allowing to browse, search and edit project documentation written in
 [Markdown](http://daringfireball.net/projects/markdown/).
 
-![screen](https://cloud.githubusercontent.com/assets/593151/18880044/d78afab4-84d6-11e6-8953-a0c4ece3cd64.png)
+![screenshot](https://cloud.githubusercontent.com/assets/593151/18916305/4dcdf5ba-8594-11e6-8eff-831153b784fb.png)
 
 Features:
 

@@ -2,6 +2,7 @@
 
 let Promise = require('bluebird');
 let fs = Promise.promisifyAll(require('fs'));
+let mkdirpAsync = Promise.promisify(require('mkdirp'));
 let path = require('path');
 let optimist = require('optimist');
 let express = require('express');
@@ -54,7 +55,8 @@ app.get('*', (req, res, next) => {
   let route = Helpers.extractRoute(req.path);
   let query = req.query || {};
   let rootIndex = -1;
-  let edit = query.edit && JSON.parse(query.edit);
+  let create = Helpers.hasQueryOption(query, 'create');
+  let edit = Helpers.hasQueryOption(query, 'edit') || create;
   let filePath, icon, search, error, title;
 
   function tryProcessFile() {
@@ -66,18 +68,25 @@ app.get('*', (req, res, next) => {
         search = query.search && query.search.length > 0 ? query.search.trim() : null;
 
         if (stat.isDirectory() && !search && !error) {
-          // Try to find a root file
-          route = path.join(route, ROOT_FILES[++rootIndex]);
-          return tryProcessFile();
+          if (!create) {
+            // Try to find a root file
+            route = path.join(route, ROOT_FILES[++rootIndex]);
+            return tryProcessFile();
+          } else {
+            route = '/';
+            title = 'Error';
+            error = `Cannot create file \`${filePath}\``;
+          }
         }
 
         if (error) {
+          edit = false;
           contentPromise = Promise.resolve(Renderer.renderMarkdown(error));
           icon = 'octicon-alert';
         } else if (search) {
           contentPromise = renderer.renderSearch(query.search);
           icon = 'octicon-search';
-        } else if (query.raw && JSON.parse(query.raw)) {
+        } else if (Helpers.hasQueryOption(query, 'raw')) {
           // Access raw content: images, code, etc
           return res.sendFile(filePath);
         } else if (Matcher.isMarkdown(filePath)) {
@@ -113,8 +122,24 @@ app.get('*', (req, res, next) => {
         }
       })
       .catch(() => {
-        if (rootIndex !== -1 && rootIndex < ROOT_FILES.length) {
-          route = path.join(path.dirname(route), ROOT_FILES[rootIndex++]);
+        if (create) {
+          let fixedRoute = Helpers.ensureMarkdownExtension(route);
+          if (fixedRoute !== route) {
+            return res.redirect(fixedRoute + '?create=1');
+          }
+
+          return mkdirpAsync(path.dirname(filePath))
+            .then(() => fs.writeFileAsync(filePath, ''))
+            .then(() => indexer.updateIndexForFile(filePath))
+            .catch((e) => {
+              console.error(e);
+              title = 'Error';
+              error = `Cannot create file \`${filePath}\``;
+              route = '/';
+            })
+            .then(tryProcessFile);
+        } else if (rootIndex !== -1 && rootIndex < ROOT_FILES.length - 1) {
+          route = path.join(path.dirname(route), ROOT_FILES[++rootIndex]);
         } else {
           route = '/';
           title = '404 Error';

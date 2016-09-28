@@ -9,7 +9,11 @@ window.mdds = (function () {
     if (editorElem) {
       editor = ace.edit('editor');
       editor.setTheme('ace/theme/clouds');
-      editor.getSession().setMode('ace/mode/markdown');
+      let session = editor.getSession();
+      let count = session.getLength();
+      session.setMode('ace/mode/markdown');
+      editor.focus();
+      editor.gotoLine(count, session.getLine(count-1).length);
     }
 
     document.addEventListener('click', function (e) {

@@ -6,7 +6,7 @@ block content
       .file-header
         if icon === 'octicon-file'
           .file-actions
-            a(href='#' onclick='mdds.save()').muted-link
+            button.btn-link.muted-link(onclick='mdds.save()')
               span.octicon.octicon-check
               |  Save
         span.header-title

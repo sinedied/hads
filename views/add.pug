@@ -2,7 +2,7 @@
   .boxed-group
     h3 Add new file
       button.octicon.octicon-x.float-right.close-button(onclick='mdds.closeAdd()')
-    form.boxed-group-inner(onsubmit='mdds.add(this.file); return false')
+    form.boxed-group-inner(onsubmit='mdds.add(this.file.value); return false')
       p
         label(for='add') File name
       p
