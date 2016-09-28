@@ -1,10 +1,10 @@
 {
-  "name": "mdds",
+  "name": "hads",
   "version": "1.0.1",
-  "description": "Simple web server allowing to browse, search and edit project documentation written in Markdown",
+  "description": "Fast web server allowing to browse, search and edit project documentation written in Markdown",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sinedied/mdds.git"
+    "url": "https://github.com/sinedied/hads.git"
   },
   "keywords": [
     "markdown",
@@ -23,16 +23,16 @@
   ],
   "author": "Yohan Lasorsa",
   "license": "MIT",
-  "homepage": "https://github.com/sinedied/mdds",
+  "homepage": "https://github.com/sinedied/hads",
   "bugs": {
-    "url": "https://github.com/sinedied/mdds/issues"
+    "url": "https://github.com/sinedied/hads/issues"
   },
-  "main": "mdds.js",
+  "main": "hads.js",
   "scripts": {
-    "start": "node mdds.js -o"
+    "start": "node hads.js -o"
   },
   "bin": {
-    "mdds": "./bin/mdds"
+    "hads": "./bin/hads"
   },
   "engines": {
     "node": ">=4.0.0"

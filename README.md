@@ -1,25 +1,27 @@
-# Markdown Documentation Server (mdds)
+# Hey it's Another Documentation Server! (hads)
 
-Fast web server allowing to browse, search and edit project documentation written in
+Fast local web server to browse, search and edit project documentation written in
 [Markdown](http://daringfireball.net/projects/markdown/).
+
 
 ![screenshot](https://cloud.githubusercontent.com/assets/593151/18916305/4dcdf5ba-8594-11e6-8eff-831153b784fb.png)
 
-Features:
+**Features**:
 
-- **No configuration needed**
+- No configuration needed
 - Github-like presentation
 - GFM ([Github Flavoured Markdown](https://guides.github.com/features/mastering-markdown/))
 - Automatic indexation and search
 - Navigation index generation using Markdown extension `[[index]]`
 - In-browser editor
+- Works 100% offline
 
 
 ## Usage
 
 ```bash
-npm install -g mdds
-mdds -o
+npm install -g hads
+hads -o
 ```
 
 Your browser will open `http://localhost:4040` and display your project documentation.
@@ -27,7 +29,7 @@ Your browser will open `http://localhost:4040` and display your project document
 ### Command-line options
 
 ```
-Usage: mdds [root dir] [options]
+Usage: hads [root dir] [options]
 
 Options:
   -p, --port  Port number to listen on       [default: 4040]

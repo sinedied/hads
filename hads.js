@@ -42,10 +42,10 @@ app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'pug');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-app.use('/_mdds/', express.static(path.join(__dirname, '/public')));
-app.use('/_mdds/highlight/', express.static(path.join(__dirname, 'node_modules/highlight.js/styles')));
-app.use('/_mdds/octicons/', express.static(path.join(__dirname, 'node_modules/octicons/build/font')));
-app.use('/_mdds/ace/', express.static(path.join(__dirname, 'node_modules/ace-builds/src-min/')));
+app.use('/_hads/', express.static(path.join(__dirname, '/public')));
+app.use('/_hads/highlight/', express.static(path.join(__dirname, 'node_modules/highlight.js/styles')));
+app.use('/_hads/octicons/', express.static(path.join(__dirname, 'node_modules/octicons/build/font')));
+app.use('/_hads/ace/', express.static(path.join(__dirname, 'node_modules/ace-builds/src-min/')));
 
 const ROOT_FILES = ['index.md', 'README.md', 'readme.md'];
 const STYLESHEETS = ['/highlight/github.css', '/octicons/octicons.css', '/css/github.css', '/css/style.css'];

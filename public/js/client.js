@@ -1,4 +1,4 @@
-window.mdds = (function () {
+window.hads = (function () {
   'use strict';
 
   var editor = null;
@@ -18,11 +18,11 @@ window.mdds = (function () {
 
     document.addEventListener('click', function (e) {
       if (e.target.id === 'add-modal')
-        window.mdds.closeAdd();
+        window.hads.closeAdd();
     }, false);
     document.addEventListener('keydown', function (e) {
       if (e.keyCode === 27)
-        window.mdds.closeAdd();
+        window.hads.closeAdd();
     }, false);
   };
 
