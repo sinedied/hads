@@ -55,14 +55,14 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(0,0,0,.6);
+  background: rgba(0, 0, 0, .6);
 }
 
 #add-modal > .boxed-group {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%,-50%);
+  transform: translate(-50%, -50%);
 }
 
 @media screen and (max-width: 1020px) {
@@ -82,16 +82,20 @@ body {
   .container {
     max-width: none;
   }
+
   .boxed-group {
     margin: 0;
   }
+
   .header, .site-footer, .file-header {
     display: none;
   }
+
   .file {
     border: 0;
     margin: 0;
   }
+
   .markdown-body {
     padding: 0 !important;
   }
