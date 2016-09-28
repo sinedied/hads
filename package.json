@@ -1,6 +1,6 @@
 {
   "name": "hads",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Fast web server allowing to browse, search and edit project documentation written in Markdown",
   "repository": {
     "type": "git",
@@ -19,6 +19,7 @@
     "knowledgebase",
     "wiki",
     "search",
+    "mermaid",
     "nodejs"
   ],
   "author": "Yohan Lasorsa",
@@ -46,6 +47,7 @@
     "highlight.js": "^9.7.0",
     "lodash": "^4.16.1",
     "marked": "^0.3.6",
+    "mermaid": "^6.0.0",
     "mkdirp": "^0.5.1",
     "octicons": "^4.4.0",
     "open": "^0.0.5",

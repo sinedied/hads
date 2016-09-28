@@ -46,10 +46,12 @@ app.use('/_hads/', express.static(path.join(__dirname, '/public')));
 app.use('/_hads/highlight/', express.static(path.join(__dirname, 'node_modules/highlight.js/styles')));
 app.use('/_hads/octicons/', express.static(path.join(__dirname, 'node_modules/octicons/build/font')));
 app.use('/_hads/ace/', express.static(path.join(__dirname, 'node_modules/ace-builds/src-min/')));
+app.use('/_hads/mermaid/', express.static(path.join(__dirname, 'node_modules/mermaid/dist/')));
 
 const ROOT_FILES = ['index.md', 'README.md', 'readme.md'];
-const STYLESHEETS = ['/highlight/github.css', '/octicons/octicons.css', '/css/github.css', '/css/style.css'];
-const SCRIPTS = ['/ace/ace.js', '/js/client.js'];
+const STYLESHEETS = ['/highlight/github.css', '/octicons/octicons.css', '/css/github.css', '/css/style.css',
+  '/mermaid/mermaid.forest.css'];
+const SCRIPTS = ['/ace/ace.js', '/mermaid/mermaid.min.js', '/js/client.js'];
 
 app.get('*', (req, res, next) => {
   let route = Helpers.extractRoute(req.path);

@@ -7,9 +7,8 @@
 
 ### *The master of ~~hell~~ docs*
 
-> **Hads** is a fast Node.js based web server allowing to browse, search and edit project documentation written in
+> **Hads** is a fast Node.js based web server allowing to browse, search and edit documentation written in
 [Markdown](http://daringfireball.net/projects/markdown/).
-
 
 ![screenshot](https://cloud.githubusercontent.com/assets/593151/18916305/4dcdf5ba-8594-11e6-8eff-831153b784fb.png)
 
@@ -19,8 +18,9 @@
 - Github-like presentation
 - GFM ([Github Flavoured Markdown](https://guides.github.com/features/mastering-markdown/))
 - Automatic indexation and search
-- Navigation index generation using Markdown extension `[[index]]`
 - In-browser editor
+- Navigation index generation using Markdown extension `[[index]]`
+- Diagrams and flowcharts using [Mermaid](http://knsv.github.io/mermaid/) syntax
 - 100% offline
 
 
@@ -61,3 +61,16 @@ the markdown files found under the specified *root dir*. File and folder names w
 better readability.
 
 It is particularly useful on home page to provide an overview of the available documentation for your project.
+
+### Diagrams and flowcharts
+
+You can use the [Mermaid](http://knsv.github.io/mermaid/) syntax to insert diagrams and flowcharts directly in your
+markdown, but using code blocks with the `mermaid` language specified, like this:
+
+    ```mermaid
+    graph TD;
+        A-->B;
+        A-->C;
+        B-->D;
+        C-->D;
+    ```

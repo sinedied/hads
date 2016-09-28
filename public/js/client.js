@@ -9,8 +9,8 @@ window.hads = (function () {
     if (editorElem) {
       editor = ace.edit('editor');
       editor.setTheme('ace/theme/clouds');
-      let session = editor.getSession();
-      let count = session.getLength();
+      var session = editor.getSession();
+      var count = session.getLength();
       session.setMode('ace/mode/markdown');
       editor.focus();
       editor.gotoLine(count, session.getLine(count-1).length);
