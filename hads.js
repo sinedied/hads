@@ -59,10 +59,54 @@ app.get('*', (req, res, next) => {
   let rootIndex = -1;
   let create = Helpers.hasQueryOption(query, 'create');
   let edit = Helpers.hasQueryOption(query, 'edit') || create;
-  let filePath, icon, search, error, title;
+  let filePath, icon, search, error, title, contentPromise;
+
+  function renderPage() {
+    if (error) {
+      edit = false;
+      contentPromise = Promise.resolve(renderer.renderMarkdown(error));
+      icon = 'octicon-alert';
+    } else if (search) {
+      contentPromise = renderer.renderSearch(query.search);
+      icon = 'octicon-search';
+    } else if (Helpers.hasQueryOption(query, 'raw')) {
+      // Access raw content: images, code, etc
+      return res.sendFile(filePath);
+    } else if (Matcher.isMarkdown(filePath)) {
+      contentPromise = edit ? renderer.renderRaw(filePath) : renderer.renderFile(filePath);
+      icon = 'octicon-file';
+    } else if (Matcher.isImage(filePath)) {
+      contentPromise = renderer.renderImageFile(route);
+      icon = 'octicon-file-media';
+    } else if (Matcher.isSourceCode(filePath)) {
+      contentPromise = renderer.renderSourceCode(filePath, path.extname(filePath).replace('.', ''));
+      icon = 'octicon-file-code';
+    }
+
+    if (!title) {
+      title = search ? renderer.searchResults : path.basename(filePath);
+    }
+
+    if (contentPromise) {
+      return contentPromise.then((content) => {
+        res.render(edit ? 'edit' : 'file', {
+          title: title,
+          route: route,
+          icon: icon,
+          search: search,
+          content: content,
+          styles: STYLESHEETS,
+          scripts: SCRIPTS,
+          pkg: pkg
+        });
+      });
+    } else {
+      next();
+    }
+  }
 
   function tryProcessFile() {
-    let contentPromise = null;
+    contentPromise = null;
     filePath = path.join(rootPath, route);
 
     return fs.statAsync(filePath)
@@ -81,47 +125,7 @@ app.get('*', (req, res, next) => {
           }
         }
 
-        if (error) {
-          edit = false;
-          contentPromise = Promise.resolve(Renderer.renderMarkdown(error));
-          icon = 'octicon-alert';
-        } else if (search) {
-          contentPromise = renderer.renderSearch(query.search);
-          icon = 'octicon-search';
-        } else if (Helpers.hasQueryOption(query, 'raw')) {
-          // Access raw content: images, code, etc
-          return res.sendFile(filePath);
-        } else if (Matcher.isMarkdown(filePath)) {
-          contentPromise = edit ? renderer.renderRaw(filePath) : renderer.renderFile(filePath);
-          icon = 'octicon-file';
-        } else if (Matcher.isImage(filePath)) {
-          contentPromise = renderer.renderImageFile(route);
-          icon = 'octicon-file-media';
-        } else if (Matcher.isSourceCode(filePath)) {
-          contentPromise = renderer.renderSourceCode(filePath, path.extname(filePath).replace('.', ''));
-          icon = 'octicon-file-code';
-        }
-
-        if (!title) {
-          title = search ? renderer.searchResults : path.basename(filePath);
-        }
-
-        if (contentPromise) {
-          return contentPromise.then((content) => {
-            res.render(edit ? 'edit' : 'file', {
-              title: title,
-              route: route,
-              icon: icon,
-              search: search,
-              content: content,
-              styles: STYLESHEETS,
-              scripts: SCRIPTS,
-              pkg: pkg
-            });
-          });
-        } else {
-          next();
-        }
+        return renderPage();
       })
       .catch(() => {
         if (create) {
@@ -133,21 +137,29 @@ app.get('*', (req, res, next) => {
           return mkdirpAsync(path.dirname(filePath))
             .then(() => fs.writeFileAsync(filePath, ''))
             .then(() => indexer.updateIndexForFile(filePath))
+            .then(tryProcessFile)
             .catch((e) => {
               console.error(e);
               title = 'Error';
               error = `Cannot create file \`${filePath}\``;
               route = '/';
-            })
-            .then(tryProcessFile);
+              return renderPage();
+            });
         } else if (rootIndex !== -1 && rootIndex < ROOT_FILES.length - 1) {
           route = path.join(path.dirname(route), ROOT_FILES[++rootIndex]);
+          return tryProcessFile();
         } else {
-          route = '/';
+          if (path.dirname(route) === '/' && rootIndex === ROOT_FILES.length - 1) {
+            error = '## No home page (╥﹏╥)\nDo you want to create an [index.md](/index.md?create=1) or ' +
+              '[readme.md](/readme.md?create=1) file perhaps?'
+          } else {
+            error = '## File not found ¯\\\\\\_(◕\\_\\_◕)_/¯\n> *There\'s a glitch in the matrix...*';
+          }
           title = '404 Error';
-          error = '## File not found ¯\\\\\\_(◕\\_\\_◕)_/¯\n> *There\'s a glitch in the matrix...*';
+          route = '/';
+
+          return renderPage();
         }
-        return tryProcessFile();
       });
   }
 
