@@ -1,17 +1,19 @@
 'use strict';
 
-let Promise = require('bluebird');
-let fs = Promise.promisifyAll(require('fs'));
-let mkdirpAsync = Promise.promisify(require('mkdirp'));
-let path = require('path');
-let optimist = require('optimist');
-let express = require('express');
-let bodyParser = require('body-parser');
-let pkg = require('./package.json');
-let Matcher = require('./lib/matcher.js');
-let Renderer = require('./lib/renderer.js');
-let Helpers = require('./lib/helpers.js');
-let Indexer = require('./lib/indexer.js');
+const Promise = require('bluebird');
+const fs = Promise.promisifyAll(require('fs'));
+const mkdirpAsync = Promise.promisify(require('mkdirp'));
+const os = require('os');
+const path = require('path');
+const optimist = require('optimist');
+const express = require('express');
+const multer = require('multer');
+const bodyParser = require('body-parser');
+const pkg = require('./package.json');
+const Matcher = require('./lib/matcher.js');
+const Renderer = require('./lib/renderer.js');
+const Helpers = require('./lib/helpers.js');
+const Indexer = require('./lib/indexer.js');
 
 let args = optimist
   .usage(`\n${pkg.name} ${pkg.version}\nUsage: $0 [root dir] [options]`)
@@ -47,11 +49,22 @@ app.use('/_hads/highlight/', express.static(path.join(__dirname, 'node_modules/h
 app.use('/_hads/octicons/', express.static(path.join(__dirname, 'node_modules/octicons/build/font')));
 app.use('/_hads/ace/', express.static(path.join(__dirname, 'node_modules/ace-builds/src-min/')));
 app.use('/_hads/mermaid/', express.static(path.join(__dirname, 'node_modules/mermaid/dist/')));
+app.use('/_hads/dropzone/', express.static(path.join(__dirname, 'node_modules/dropzone/dist/min/')));
 
 const ROOT_FILES = ['index.md', 'README.md', 'readme.md'];
 const STYLESHEETS = ['/highlight/github.css', '/octicons/octicons.css', '/css/github.css', '/css/style.css',
   '/mermaid/mermaid.forest.css'];
-const SCRIPTS = ['/ace/ace.js', '/mermaid/mermaid.min.js', '/js/client.js'];
+const SCRIPTS = ['/ace/ace.js', '/mermaid/mermaid.min.js', '/dropzone/dropzone.min.js', '/js/client.js'];
+
+app.post('/_hads/upload', [multer({
+  dest: path.join(rootPath, 'images'),  // os.tmpdir()
+  limits: {
+    fileSize: 1024 * 10   // 10 MB
+  }
+}).single('file'), (req, res) => {
+  console.log(req.file);
+  res.json(path.relative(rootPath, req.file.path));
+}]);
 
 app.get('*', (req, res, next) => {
   let route = Helpers.extractRoute(req.path);
