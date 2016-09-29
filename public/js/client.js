@@ -1,5 +1,5 @@
 window.hads = (function () {
-  'use strict';
+    'use strict';
 
   var editor = null;
   var byId = document.getElementById.bind(document);
@@ -31,7 +31,8 @@ window.hads = (function () {
         useSoftTabs: true,
         tabSize: 2,
         mode: 'ace/mode/markdown',
-        theme: 'ace/theme/clouds'
+        theme: 'ace/theme/clouds',
+        useWrapMode: true
       });
       var session = editor.getSession();
       var count = session.getLength();
@@ -48,15 +49,36 @@ window.hads = (function () {
       });
     }
 
+    var textarea = document.getElementsByTagName('textarea')[0];
+    var init = function () {
+      var caretPos = 0;
+      this.on('drop', function (e) {
+        caretPos = textarea.selectionStart;
+      });
+      this.on('success', function (file, path) {
+        console.log(file);
+        console.log(path);
+        session.insert(session.getSelection().getCursor(), '![](' + path + ')');
+        // var text = textarea.value;
+        // console.log(text);
+        // textarea.value = text.substring(0, caretPos) + '\n![description](' + path + ')\n' + text.substring(caretPos);
+      });
+      this.on('error', function (file, error, xhr) {
+        console.log('Error:', error);
+      });
+    };
+    var myDropzone = new Dropzone('#editor', {url: '/_hads/upload', init: init});
+
     document.addEventListener('click', function (e) {
-      if (e.target.id === 'add-modal')
-        window.hads.closeAdd();
-    }, false);
-    document.addEventListener('keydown', function (e) {
-      if (e.keyCode === 27)
-        window.hads.closeAdd();
-    }, false);
-  };
+          if (e.target.id === 'add-modal')
+            window.hads.closeAdd();
+        }, false);
+        document.addEventListener('keydown', function (e) {
+          if (e.keyCode === 27)
+            window.hads.closeAdd();
+        }, false);
+      }
+    };
 
   return module;
 })();
