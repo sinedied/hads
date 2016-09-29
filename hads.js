@@ -149,7 +149,7 @@ app.get('*', (req, res, next) => {
           route = path.join(path.dirname(route), ROOT_FILES[++rootIndex]);
           return tryProcessFile();
         } else {
-          if (path.dirname(route) === '/' && rootIndex === ROOT_FILES.length - 1) {
+          if (path.dirname(route) === path.sep && rootIndex === ROOT_FILES.length - 1) {
             error = '## No home page (╥﹏╥)\nDo you want to create an [index.md](/index.md?create=1) or ' +
               '[readme.md](/readme.md?create=1) file perhaps?'
           } else {
