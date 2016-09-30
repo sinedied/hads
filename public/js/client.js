@@ -3,30 +3,7 @@ window.hads = (function () {
 
   var editor = null;
   var byId = document.getElementById.bind(document);
-
-  window.onload = function () {
-    var editorElem = byId('editor');
-    if (editorElem) {
-      editor = ace.edit('editor');
-      editor.setTheme('ace/theme/clouds');
-      var session = editor.getSession();
-      var count = session.getLength();
-      session.setMode('ace/mode/markdown');
-      editor.focus();
-      editor.gotoLine(count, session.getLine(count-1).length);
-    }
-
-    document.addEventListener('click', function (e) {
-      if (e.target.id === 'add-modal')
-        window.hads.closeAdd();
-    }, false);
-    document.addEventListener('keydown', function (e) {
-      if (e.keyCode === 27)
-        window.hads.closeAdd();
-    }, false);
-  };
-
-  return {
+  var module = {
     save: function () {
       if (editor) {
         byId('content').value = editor.getValue();
@@ -44,5 +21,42 @@ window.hads = (function () {
       this.closeAdd();
       window.location = '/' + file + '?create=1';
     }
-  }
+  };
+
+  window.onload = function () {
+    var editorElem = byId('editor');
+    if (editorElem) {
+      editor = ace.edit('editor');
+      editor.setOptions({
+        useSoftTabs: true,
+        tabSize: 2,
+        mode: 'ace/mode/markdown',
+        theme: 'ace/theme/clouds'
+      });
+      var session = editor.getSession();
+      var count = session.getLength();
+      editor.focus();
+      editor.gotoLine(count, session.getLine(count-1).length);
+      editor.commands.addCommand({
+        name: 'save',
+        bindKey: {
+          win: 'Ctrl-S',
+          mac: 'Command-S'
+        },
+        exec: module.save,
+        readOnly: true
+      });
+    }
+
+    document.addEventListener('click', function (e) {
+      if (e.target.id === 'add-modal')
+        window.hads.closeAdd();
+    }, false);
+    document.addEventListener('keydown', function (e) {
+      if (e.keyCode === 27)
+        window.hads.closeAdd();
+    }, false);
+  };
+
+  return module;
 })();
