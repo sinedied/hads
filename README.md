@@ -60,7 +60,7 @@ If you insert the text `[[index]]` in any of your markdown files, it will be rep
 the markdown files found under the specified *root dir*. File and folder names will be automatically *humanized* for
 better readability.
 
-It is particularly useful on home page to provide an overview of the available documentation for your project.
+It is particularly useful on the home page to provide an overview of the available documentation for your project.
 
 ### Diagrams and flowcharts
 
