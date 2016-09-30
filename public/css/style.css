@@ -48,6 +48,10 @@ body {
   font-size: 85%;
 }
 
+.mermaid:not([data-processed='true']) {
+  visibility: hidden;
+}
+
 #add-modal {
   position: fixed;
   z-index: 9999;
