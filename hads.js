@@ -9,6 +9,7 @@ const optimist = require('optimist');
 const express = require('express');
 const multer = require('multer');
 const bodyParser = require('body-parser');
+const shortId = require('shortid');
 const pkg = require('./package.json');
 const Matcher = require('./lib/matcher.js');
 const Renderer = require('./lib/renderer.js');
@@ -57,13 +58,21 @@ const STYLESHEETS = ['/highlight/github.css', '/octicons/octicons.css', '/css/gi
 const SCRIPTS = ['/ace/ace.js', '/mermaid/mermaid.min.js', '/dropzone/dropzone.min.js', '/js/client.js'];
 
 app.post('/_hads/upload', [multer({
-  dest: path.join(rootPath, 'images'),  // os.tmpdir()
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      let route = req.query.route != undefined ? req.query.route : '';
+      cb(null, path.join(rootPath, path.dirname(Helpers.sanitizePath(route))));
+    },
+    filename: (req, file, cb) => {
+      cb(null, shortId.generate() + path.extname(file.originalname))
+    }
+  }),
+  onFileUploadStart: (file) => !file.mimetype.match(/^image\//),
   limits: {
-    fileSize: 1024 * 10   // 10 MB
+    fileSize: 1024 * 1024 * 10   // 10 MB
   }
 }).single('file'), (req, res) => {
-  console.log(req.file);
-  res.json(path.relative(rootPath, req.file.path));
+  res.json(path.sep + path.relative(rootPath, req.file.path));
 }]);
 
 app.get('*', (req, res, next) => {

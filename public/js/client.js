@@ -23,6 +23,10 @@ window.hads = (function () {
     }
   };
 
+  function getUploadMessage(file) {
+    return '![Uploading ' + file + '...]()';
+  }
+
   window.onload = function () {
     var editorElem = byId('editor');
     if (editorElem) {
@@ -32,12 +36,13 @@ window.hads = (function () {
         tabSize: 2,
         mode: 'ace/mode/markdown',
         theme: 'ace/theme/clouds',
-        useWrapMode: true
+        highlightActiveLine: false,
+        wrap: true
       });
       var session = editor.getSession();
       var count = session.getLength();
       editor.focus();
-      editor.gotoLine(count, session.getLine(count-1).length);
+      editor.gotoLine(count, session.getLine(count - 1).length);
       editor.commands.addCommand({
         name: 'save',
         bindKey: {
@@ -46,6 +51,30 @@ window.hads = (function () {
         },
         exec: hads.save,
         readOnly: true
+      });
+
+      var route = byId('route').value;
+      Dropzone.autoDiscover = false;
+      new Dropzone('#editor', {
+        url: '/_hads/upload?route=' + encodeURI(route),
+        acceptedFiles: 'image/*',
+        maxFilesize: 10,  // 10 MB
+        init: function () {
+          this.on('processing', function (file) {
+            var pos = session.getSelection().getCursor();
+            session.insert(pos, getUploadMessage(file.name));
+          });
+          this.on('success', function (file, path) {
+            editor.replace('![' + file.name + '](' + path + ')', {
+              needle: getUploadMessage(file.name)
+            });
+          });
+          this.on('error', function (file) {
+            editor.replace('![Error!]()', {
+              needle: getUploadMessage(file.name)
+            });
+          });
+        }
       });
     }
 

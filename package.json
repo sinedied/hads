@@ -57,6 +57,7 @@
     "pug": "^2.0.0-beta6",
     "recursive-readdir": "^2.1.0",
     "remove-markdown": "^0.1.0",
+    "shortid": "^2.2.6",
     "string-humanize": "^1.0.0"
   },
   "devDependencies": {}
