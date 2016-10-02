@@ -77,15 +77,11 @@ app.get('*', (req, res, next) => {
     } else if (search) {
       contentPromise = renderer.renderSearch(query.search);
       icon = 'octicon-search';
-    } else if (Helpers.hasQueryOption(query, 'raw')) {
-      // Access raw content: images, code, etc
+    } else if (Helpers.hasQueryOption(query, 'raw') || Matcher.isImage(filePath)) {
       return res.sendFile(filePath);
     } else if (Matcher.isMarkdown(filePath)) {
       contentPromise = edit ? renderer.renderRaw(filePath) : renderer.renderFile(filePath);
       icon = 'octicon-file';
-    } else if (Matcher.isImage(filePath)) {
-      contentPromise = renderer.renderImageFile(route);
-      icon = 'octicon-file-media';
     } else if (Matcher.isSourceCode(filePath)) {
       contentPromise = renderer.renderSourceCode(filePath, path.extname(filePath).replace('.', ''));
       icon = 'octicon-file-code';
