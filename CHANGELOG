@@ -1,0 +1,28 @@
+# 1.2.0
+
++ Added [[toc]] table of contents markdown extension
++ Added images drag'n drop support to editor
++ Added save (CTRL+S/CMD+S) keyboard shortcut to editor
++ Mermaid diagram code is now hidden during processing
+- Removed specific rendering for images
+- Small fixes and performance improvements
+
+# 1.1.2
+
+- Fixed issue on Windows
+
+# 1.1.1
+
++ Added print-friendly styling
+- Fixed issue when no home page was present
+
+# 1.1.0
+
++ Added mermaid syntax support to generate diagrams
+- Fixed [[index]] in code blocks
+- Fixed search extracts
+
+# 1.0.1
+
++ Adding new markdown files support
+- Renamed project to "hads"
