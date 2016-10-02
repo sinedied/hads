@@ -20,8 +20,10 @@
 - GFM ([Github Flavoured Markdown](https://guides.github.com/features/mastering-markdown/))
 - Automatic indexation and search
 - In-browser editor
-- Navigation index generation using Markdown extension `[[index]]`
+- Table of contents using Markdown extension `[[toc]]`
+- Navigation index using Markdown extension `[[index]]`
 - Diagrams and flowcharts using [Mermaid](http://knsv.github.io/mermaid/) syntax
+- Drag'n drop images
 - 100% offline
 
 
@@ -40,10 +42,11 @@ Your browser will open `http://localhost:4040` and display your project document
 Usage: hads [root dir] [options]
 
 Options:
-  -p, --port  Port number to listen on       [default: 4040]
-  -h, --host  Host address to bind to        [default: "localhost"]
-  -o, --open  Open default browser on start
-  --help      Show this help
+  -p, --port        Port number to listen on       [default: 4040]
+  -h, --host        Host address to bind to        [default: "localhost"]
+  -i, --images-dir  Directory to store images      [default: "images"]
+  -o, --open        Open default browser on start
+  --help            Show this help
 ```
 
 If no root dir is specified, `./` will be used.
@@ -55,11 +58,14 @@ If no root dir is specified, `./` will be used.
 The server will automatically search for a file named `index.md`, `readme.md` or `README.md` on the specified
 documentation root and will use it as your home page.
 
+### Table of contents
+
+The special text `[[toc]]` will be replaced by the table of contents of the markdown document, based on headings.
+
 ### Navigation index
 
-If you insert the text `[[index]]` in any of your markdown files, it will be replaced by the full navigation index of
-the markdown files found under the specified *root dir*. File and folder names will be automatically *humanized* for
-better readability.
+The special text `[[index]]` will be replaced by the full navigation index of all markdown files found under the
+specified *root dir*. File and folder names will be *humanized* for better readability.
 
 It is particularly useful on the home page to provide an overview of the available documentation for your project.
 
