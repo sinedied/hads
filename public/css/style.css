@@ -52,6 +52,11 @@ body {
   visibility: hidden;
 }
 
+.drag-and-drop {
+  border: none;
+  border-top: 1px dashed #ddd;
+}
+
 #add-modal {
   position: fixed;
   z-index: 9999;
