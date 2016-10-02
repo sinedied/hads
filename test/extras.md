@@ -1,19 +1,35 @@
 # Test cases for extra features
 
+## Table of contents
+
+A TOC should be inserted below:
+[[toc]]
+
+But not here: `[[toc]]`
+
+And here:
+```
+[[toc]]
+```
+And here: [[toc]]
+
 ## Index generation
 
 An index should be inserted below:
 [[index]]
 
 But not here: `[[index]]`
+
 And here:
 ```
 [[index]]
 ```
+And here: [[index]]
+
 
 ## Mermaid graphs
 
-### Flowchart:
+### Flowchart
 
 ```mermaid
 graph TD;
@@ -32,7 +48,7 @@ graph TD;
     C -->|Two| E[Result two];
 ```
 
-### Sequence diagram:
+### Sequence diagram
 ```mermaid
 sequenceDiagram
     participant Alice
@@ -62,7 +78,7 @@ sequenceDiagram
     Bob-->John: Jolly good!
 ```
 
-### Gantt:
+### Gantt
 ```mermaid
 gantt
         dateFormat  YYYY-MM-DD
