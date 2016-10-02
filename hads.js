@@ -24,6 +24,9 @@ let args = optimist
   .alias('h', 'host')
   .describe('h', 'Host address to bind to')
   .default('h', 'localhost')
+  .alias('i', 'images-dir')
+  .describe('i', 'Directory to store images')
+  .default('i', 'images')
   .alias('o', 'open')
   .boolean('o')
   .describe('o', 'Open default browser on start')
@@ -37,6 +40,7 @@ if (args.help || args._.length > 1) {
 
 let docPath = args._[0] || './';
 let rootPath = path.resolve(docPath);
+let imagesPath = path.join(rootPath, Helpers.sanitizePath(args.i));
 let indexer = new Indexer(rootPath);
 let renderer = new Renderer(indexer);
 let app = express();
@@ -56,24 +60,6 @@ const ROOT_FILES = ['index.md', 'README.md', 'readme.md'];
 const STYLESHEETS = ['/highlight/github.css', '/octicons/octicons.css', '/css/github.css', '/css/style.css',
   '/mermaid/mermaid.forest.css'];
 const SCRIPTS = ['/ace/ace.js', '/mermaid/mermaid.min.js', '/dropzone/dropzone.min.js', '/js/client.js'];
-
-app.post('/_hads/upload', [multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      let route = req.query.route != undefined ? req.query.route : '';
-      cb(null, path.join(rootPath, path.dirname(Helpers.sanitizePath(route))));
-    },
-    filename: (req, file, cb) => {
-      cb(null, shortId.generate() + path.extname(file.originalname))
-    }
-  }),
-  onFileUploadStart: (file) => !file.mimetype.match(/^image\//),
-  limits: {
-    fileSize: 1024 * 1024 * 10   // 10 MB
-  }
-}).single('file'), (req, res) => {
-  res.json(path.sep + path.relative(rootPath, req.file.path));
-}]);
 
 app.get('*', (req, res, next) => {
   let route = Helpers.extractRoute(req.path);
@@ -217,6 +203,23 @@ app.post('*', (req, res, next) => {
       next();
     })
 });
+
+app.post('/_hads/upload', [multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => { cb(null, imagesPath); },
+    filename: (req, file, cb) => {
+      mkdirpAsync(imagesPath).then(() => {
+        cb(null, shortId.generate() + path.extname(file.originalname))
+      });
+    }
+  }),
+  onFileUploadStart: (file) => !file.mimetype.match(/^image\//),
+  limits: {
+    fileSize: 1024 * 1024 * 10   // 10 MB
+  }
+}).single('file'), (req, res) => {
+  res.json(path.sep + path.relative(rootPath, req.file.path));
+}]);
 
 indexer.indexFiles().then(() => {
   app.listen(args.port, args.host, () => {
