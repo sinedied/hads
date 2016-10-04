@@ -13,7 +13,7 @@ block content
             span.octicon(class=icon)
             |  #{title}
       .readme.instapaper_body
-        #editor.hidden.markdown-body !{content}
+        #editor.hidden.markdown-body #{content}
         p.drag-and-drop Attach images by dragging & dropping them
         input#route.hidden(value=route)
         form#form(method='post' action=route)
