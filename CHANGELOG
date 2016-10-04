@@ -1,3 +1,7 @@
+# 1.2.1
+
+- Fixed edition of markdown files containing HTML tags
+
 # 1.2.0
 
 + Added [[toc]] table of contents markdown extension
