@@ -20,6 +20,9 @@ window.hads = (function () {
     add: function (file) {
       this.closeAdd();
       window.location = '/' + file + '?create=1';
+    },
+    uploadImage: function() {
+      document.getElementsByClassName('dz-hidden-input')[0].click();
     }
   };
 
@@ -55,10 +58,11 @@ window.hads = (function () {
 
       var route = byId('route').value;
       Dropzone.autoDiscover = false;
-      new Dropzone('#editor', {
+      new Dropzone('.ace_scroller', {
         url: '/_hads/upload?route=' + encodeURI(route),
         acceptedFiles: 'image/*',
         maxFilesize: 10,  // 10 MB
+        addedfile: function() {},
         init: function () {
           this.on('processing', function (file) {
             var pos = session.getSelection().getCursor();
