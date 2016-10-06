@@ -81,3 +81,7 @@ markdown, but using code blocks with the `mermaid` language specified, like this
         B-->D;
         C-->D;
     ```
+    
+## Updates
+
+See changelog [here](CHANGELOG)

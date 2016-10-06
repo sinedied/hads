@@ -1,3 +1,11 @@
+# 1.2.2
+
++ Added image file selector button
+- Fixed line endings on edited documents for unix platforms
+- Fixed shape rendering for Mermaid graphs
+- Fixed unwanted file dialog display
+- Removed unwanted uploaded file previews
+
 # 1.2.1
 
 - Fixed edition of markdown files containing HTML tags
