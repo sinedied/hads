@@ -52,6 +52,10 @@ body {
   visibility: hidden;
 }
 
+rect {
+  shape-rendering: auto !important;
+}
+
 .drag-and-drop {
   border: none;
   border-top: 1px dashed #ddd;
