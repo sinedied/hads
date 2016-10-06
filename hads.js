@@ -176,8 +176,13 @@ app.post('*', (req, res, next) => {
 
   fs.statAsync(filePath)
     .then((stat) => {
-      if (stat.isFile() && req.body.content) {
-        return fs.writeFileAsync(filePath, req.body.content);
+      let fileContent = req.body.content;
+      if (stat.isFile() && fileContent) {
+        if (process.platform !== 'win32') {
+          // www-form-urlencoded data always use CRLF line endings, so this is a quick fix
+          fileContent = fileContent.replace(/\r\n/g, '\n');
+        }
+        return fs.writeFileAsync(filePath, fileContent);
       }
     })
     .then(() => {
