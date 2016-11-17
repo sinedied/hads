@@ -64,7 +64,7 @@ const SCRIPTS = ['/ace/ace.js', '/mermaid/mermaid.min.js', '/dropzone/dropzone.m
 app.get('*', (req, res, next) => {
   let route = Helpers.extractRoute(req.path);
   let query = req.query || {};
-  let rootIndex = -1;
+  let rootIndex = -1, mdIndex = -1;
   let create = Helpers.hasQueryOption(query, 'create');
   let edit = Helpers.hasQueryOption(query, 'edit') || create;
   let filePath, icon, search, error, title, contentPromise;
@@ -151,6 +151,12 @@ app.get('*', (req, res, next) => {
             });
         } else if (rootIndex !== -1 && rootIndex < ROOT_FILES.length - 1) {
           route = path.join(path.dirname(route), ROOT_FILES[++rootIndex]);
+          return tryProcessFile();
+        } else if (rootIndex === -1 && path.basename(route) !== '' && (path.extname(route) === '' || mdIndex > -1) &&
+            mdIndex < Matcher.MARKDOWN_EXTENSIONS.length - 1) {
+          // Maybe it's a github-style link without extension, let's try adding one
+          let extension = Matcher.MARKDOWN_EXTENSIONS[++mdIndex];
+          route = path.join(path.dirname(route), `${path.basename(route, path.extname(route))}.${extension}`);
           return tryProcessFile();
         } else {
           if (path.dirname(route) === path.sep && rootIndex === ROOT_FILES.length - 1) {
