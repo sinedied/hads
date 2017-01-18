@@ -38,6 +38,10 @@ if (args.help || args._.length > 1) {
   process.exit();
 }
 
+// Find node_modules base path
+let modulesBasePath = require.resolve('highlight.js');
+modulesBasePath = modulesBasePath.substr(0, modulesBasePath.lastIndexOf('node_modules'));
+
 let docPath = args._[0] || './';
 let rootPath = path.resolve(docPath);
 let imagesPath = path.join(rootPath, Helpers.sanitizePath(args.i));
@@ -50,15 +54,15 @@ app.set('view engine', 'pug');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use('/_hads/', express.static(path.join(__dirname, '/public')));
-app.use('/_hads/highlight/', express.static(path.join(__dirname, 'node_modules/highlight.js/styles')));
-app.use('/_hads/octicons/', express.static(path.join(__dirname, 'node_modules/octicons/build/font')));
-app.use('/_hads/ace/', express.static(path.join(__dirname, 'node_modules/ace-builds/src-min/')));
-app.use('/_hads/mermaid/', express.static(path.join(__dirname, 'node_modules/mermaid/dist/')));
-app.use('/_hads/dropzone/', express.static(path.join(__dirname, 'node_modules/dropzone/dist/min/')));
+app.use('/_hads/highlight/', express.static(path.join(modulesBasePath, 'node_modules/highlight.js/styles')));
+app.use('/_hads/octicons/', express.static(path.join(modulesBasePath, 'node_modules/octicons/build/font')));
+app.use('/_hads/ace/', express.static(path.join(modulesBasePath, 'node_modules/ace-builds/src-min/')));
+app.use('/_hads/mermaid/', express.static(path.join(modulesBasePath, 'node_modules/mermaid/dist/')));
+app.use('/_hads/dropzone/', express.static(path.join(modulesBasePath, 'node_modules/dropzone/dist/min/')));
 
 const ROOT_FILES = ['index.md', 'README.md', 'readme.md'];
 const STYLESHEETS = ['/highlight/github.css', '/octicons/octicons.css', '/css/github.css', '/css/style.css',
-  '/mermaid/mermaid.forest.css'];
+  '/css/mermaid.neutral.css'];
 const SCRIPTS = ['/ace/ace.js', '/mermaid/mermaid.min.js', '/dropzone/dropzone.min.js', '/js/client.js'];
 
 app.get('*', (req, res, next) => {
