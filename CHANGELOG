@@ -1,3 +1,8 @@
+# 1.3.1
+
++ Added new mermaid neutral theme
+- Fixed issue with dependencies path when installed as a local module
+
 # 1.3.0
 
 + Added support for github-style markdown links (without extension)
