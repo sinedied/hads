@@ -242,3 +242,5 @@ indexer.indexFiles().then(() => {
     }
   });
 });
+
+exports = app;
