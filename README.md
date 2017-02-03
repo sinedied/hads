@@ -2,7 +2,6 @@
 
 [![NPM version](https://img.shields.io/npm/v/hads.svg)](https://www.npmjs.com/package/hads)
 ![Node version](https://img.shields.io/node/v/hads.svg)
-[![Dependency Status](https://img.shields.io/david/sinedied/hads.svg)](https://david-dm.org/sinedied/hads)
 ![Downloads](https://img.shields.io/npm/dm/hads.svg)
 [![License](https://img.shields.io/npm/l/hads.svg)](LICENSE)
 
