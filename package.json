@@ -31,7 +31,7 @@
   "main": "hads.js",
   "scripts": {
     "start": "node hads.js ./test -o",
-    "postpublish": "PACKAGE_VERSION=$(node -p -e \"require('./package.json').version\") && git tag -a $PACKAGE_VERSION -m '$PACKAGE_VERSION' && git push --tags"
+    "postpublish": "git tag -a $npm_package_version -m '$npm_package_version' && git push --tags"
   },
   "bin": {
     "hads": "./bin/hads"
@@ -49,13 +49,13 @@
     "highlight.js": "^9.8.0",
     "lodash": "^4.17.2",
     "marked": "^0.3.6",
-    "mermaid": "^6.0.0",
+    "mermaid": "^7.0.0",
     "mkdirp": "^0.5.1",
     "multer": "^1.2.0",
     "octicons": "^4.4.0",
     "open": "^0.0.5",
     "optimist": "^0.6.1",
-    "pug": "^2.0.0-beta6",
+    "pug": "2.0.0-beta11",
     "recursive-readdir": "^2.1.0",
     "remove-markdown": "^0.1.0",
     "shortid": "^2.2.6",
