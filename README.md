@@ -10,7 +10,7 @@
 > **Hads** is a fast Node.js based web server allowing to browse, search and edit documentation written in
 [Markdown](http://daringfireball.net/projects/markdown/).
 
-![screenshot](https://cloud.githubusercontent.com/assets/593151/18916305/4dcdf5ba-8594-11e6-8eff-831153b784fb.png)
+![screenshot](https://cloud.githubusercontent.com/assets/593151/24351859/afb0b958-12e7-11e7-8ad4-8655e6b3c1c1.png)
 
 **Features**:
 
