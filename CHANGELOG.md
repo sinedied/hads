@@ -1,3 +1,8 @@
+# 1.3.3
+
++ Added filter for files/folders starting with a dot
+- Updated Github CSS
+
 # 1.3.2
 
 + Added module export to allow server integration and extension
