@@ -24,6 +24,7 @@
 - Diagrams and flowcharts using [Mermaid](http://knsv.github.io/mermaid/) syntax
 - Drag'n drop images
 - 100% offline
+- Production Mode. No edition possible
 
 
 ## Usage
@@ -44,6 +45,7 @@ Options:
   -p, --port        Port number to listen on       [default: 4040]
   -h, --host        Host address to bind to        [default: "localhost"]
   -i, --images-dir  Directory to store images      [default: "images"]
+  -x, --production  Production Mode. No edition possible
   -o, --open        Open default browser on start
   --help            Show this help
 ```
