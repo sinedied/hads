@@ -25,6 +25,7 @@
 - Drag'n drop images
 - 100% offline
 - Production Mode. No edition possible
+- Possibility to hook Templates and Public files
 
 
 ## Usage
@@ -55,7 +56,7 @@ If no root dir is specified, `./` will be used.
 ## Extras
 
 ### Home page
- 
+
 The server will automatically search for a file named `index.md`, `readme.md` or `README.md` on the specified
 documentation root and will use it as your home page.
 
@@ -75,6 +76,7 @@ It is particularly useful on the home page to provide an overview of the availab
 You can use the [Mermaid](http://knsv.github.io/mermaid/) syntax to insert diagrams and flowcharts directly in your
 markdown, but using code blocks with the `mermaid` language specified, like this:
 
+
     ```mermaid
     graph TD;
         A-->B;
@@ -82,7 +84,21 @@ markdown, but using code blocks with the `mermaid` language specified, like this
         B-->D;
         C-->D;
     ```
-    
+
+### Local Dynamic Hooking
+
+You can set your own template by creating a **_hads/** directory in your root path.
+
+* You can add your own public files in **_hads/public/** which is accecible from http://<domain>/_hads/
+* You can overload the **PUG** templates used internally in **_hads/views/** as following:
+ * **add.pug**: Add template
+ * **edit.pug**: Edit Template
+ * **file.pug**: File Templater
+ * **footer.pug**: Footer
+ * **header.pug**: Header
+ * **layout.pug**: General layout
+
+
 ## Updates
 
 See changelog [here](CHANGELOG)

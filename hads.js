@@ -48,17 +48,66 @@ var indexer = new Indexer(rootPath);
 var renderer = new Renderer(indexer);
 var app = express();
 
-app.set('views', path.join(__dirname, '/views'));
-app.set('view engine', 'pug');
+// set express render engine to pug
+app.set('view engine', 'pug', {options: {resolv: function() {}}});
+
+// check whether rootPath contains __hads/views
+try {
+  fs.statSync(rootPath+'/_hads/views');
+  var rootsView = [rootPath+'/_hads/views', __dirname+'/views'];
+} catch(e) {
+  // set default views
+  var rootsView = [__dirname+'/views'];
+}
+app.set('views', rootsView);
+
+// refound the internal puf resolver
+var pugPlugin = {
+  // hook pug resolver to lookup multiple view directories
+  resolve: (filename, source, options) => {
+    filename = filename.trim();
+    if (filename[0] !== '/' && !source)
+      throw new Error('the "filename" option is required to use includes and extends with "relative" paths');
+
+    if (filename[0] === '/' && !options.basedir)
+      throw new Error('the "basedir" option is required to use includes and extends with "absolute" paths');
+
+    // check path with priority
+    if(filename[0] === '/')
+      filename = path.join(options.basedir, filename);
+    else {
+      var org = filename;
+      for(var a=0; a<rootsView.length; a++) {
+        filename = path.join(rootsView[a], org);
+        try {
+          fs.statSync(filename);
+          break;
+        } catch(e) { /* nothing here */ }
+      }
+    }
+    return filename;
+  }
+};
+
+// load rootPath __hads/public
+try {
+  fs.statSync(rootPath+'/_hads/public');
+  app.use('/_hads/', express.static(rootPath+'/_hads/public'));
+} catch(e) { /* error is useless */ }
+
+// load default hads' static files
+app.use('/_hads/', express.static(__dirname+'/public'));
+app.use('/_hads/highlight/', express.static(__dirname+'/node_modules/highlight.js/styles'));
+app.use('/_hads/octicons/', express.static(__dirname+'/node_modules/octicons/build/font'));
+app.use('/_hads/ace/', express.static(__dirname+'/node_modules/ace-builds/src-min/'));
+app.use('/_hads/mermaid/', express.static(__dirname+'/node_modules/mermaid/dist/'));
+app.use('/_hads/dropzone/', express.static(__dirname+'/node_modules/dropzone/dist/min/'));
+
+// client body request
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.use('/_hads/', express.static(__dirname+'/public'));
-app.use('/_hads/highlight/', express.static(__dirname+'node_modules/highlight.js/styles'));
-app.use('/_hads/octicons/', express.static(__dirname+'node_modules/octicons/build/font'));
-app.use('/_hads/ace/', express.static(__dirname+'node_modules/ace-builds/src-min/'));
-app.use('/_hads/mermaid/', express.static(__dirname+'node_modules/mermaid/dist/'));
-app.use('/_hads/dropzone/', express.static(__dirname+'node_modules/dropzone/dist/min/'));
+// TODO load application plugins in __hads/plugins
 
 const ROOT_FILES = ['index.md', 'README.md', 'readme.md'];
 const STYLESHEETS = ['/highlight/github.css', '/octicons/octicons.css', '/css/github.css', '/css/style.css',
@@ -110,6 +159,7 @@ app.get('*', (req, res, next) => {
           route: route,
           args: args,
           icon: icon,
+          plugins: [pugPlugin],
           search: search,
           content: content,
           styles: STYLESHEETS,
@@ -216,6 +266,8 @@ if(args.production == false) {
           route: route,
           icon: 'octicon-file',
           content: content,
+          plugins: [pugPlugin],
+          args: args,
           styles: STYLESHEETS,
           scripts: SCRIPTS,
           pkg: pkg
