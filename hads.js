@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug')('hads');
 const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require('fs'));
 const mkdirpAsync = Promise.promisify(require('mkdirp'));
@@ -46,6 +47,7 @@ var rootPath = path.resolve(docPath);
 var imagesPath = path.join(rootPath, Helpers.sanitizePath(args.i));
 var indexer = new Indexer(rootPath);
 var renderer = new Renderer(indexer);
+var plugins = {};
 var app = express();
 
 // set express render engine to pug
@@ -53,8 +55,8 @@ app.set('view engine', 'pug', {options: {resolv: function() {}}});
 
 // check whether rootPath contains __hads/views
 try {
-  fs.statSync(rootPath+'/_hads/views');
-  var rootsView = [rootPath+'/_hads/views', __dirname+'/views'];
+  fs.statSync(rootPath+'/__hads/views');
+  var rootsView = [rootPath+'/__hads/views', __dirname+'/views'];
 } catch(e) {
   // set default views
   var rootsView = [__dirname+'/views'];
@@ -91,8 +93,8 @@ var pugPlugin = {
 
 // load rootPath __hads/public
 try {
-  fs.statSync(rootPath+'/_hads/public');
-  app.use('/_hads/', express.static(rootPath+'/_hads/public'));
+  fs.statSync(rootPath+'/__hads/public');
+  app.use('/_hads/', express.static(rootPath+'/__hads/public'));
 } catch(e) { /* error is useless */ }
 
 // load default hads' static files
@@ -107,7 +109,25 @@ app.use('/_hads/dropzone/', express.static(__dirname+'/node_modules/dropzone/dis
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-// TODO load application plugins in __hads/plugins
+// load application plugins in __hads/plugins
+try {
+  var pDir = rootPath+'/__hads/plugins';
+  fs.statSync(pDir);
+  var files = fs.readdirSync(pDir)
+  for(var a in files) {
+    var file = files[a];
+    if(/\.js$/.test(file)) {
+      var pname = file.substr(0, file.length-3);
+      debug('Loading plugin '+pname+' from '+pDir+'/'+file);
+      (plugins[pname] = require(pDir+'/'+file))(app);
+    }
+  }
+} catch(e) { /* error is useless */ }
+
+// prevent local __hads installation to be public
+app.use('/__hads', (req, res, next) => {
+  res.status(403).send('Forbidden');
+})
 
 const ROOT_FILES = ['index.md', 'README.md', 'readme.md'];
 const STYLESHEETS = ['/highlight/github.css', '/octicons/octicons.css', '/css/github.css', '/css/style.css',

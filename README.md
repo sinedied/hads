@@ -87,10 +87,10 @@ markdown, but using code blocks with the `mermaid` language specified, like this
 
 ### Local Dynamic Hooking
 
-You can set your own template by creating a **_hads/** directory in your root path.
+You can set your own template by creating a **__hads/** directory in your root path.
 
-* You can add your own public files in **_hads/public/** which is accecible from http://<domain>/_hads/
-* You can overload the **PUG** templates used internally in **_hads/views/** as following:
+* You can add your own public files in **__hads/public/** which is accecible from http://<domain>/_hads/ (w/ only one underscore)
+* You can overload the **PUG** templates used internally in **__hads/views/** as following:
  * **add.pug**: Add template
  * **edit.pug**: Edit Template
  * **file.pug**: File Templater
