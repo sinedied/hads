@@ -113,19 +113,26 @@ var pugPlugin = {
   }
 };
 
+// define cache expire for static content
+var cacheExpire = 60*60*24;
+if(args.production !== true)
+  cacheExpire = 0;
+debug("Cache control set to "+cacheExpire+' seconds for static content');
+cacheExpire = cacheExpire*1000;
+
 // load rootPath __hads/public
 try {
   fs.statSync(rootPath+'/__hads/public');
-  app.use('/_hads/', express.static(rootPath+'/__hads/public'));
+  app.use('/_hads/', express.static(rootPath+'/__hads/public', { maxAge: cacheExpire }));
 } catch(e) { /* error is useless */ }
 
 // load default hads' static files
-app.use('/_hads/', express.static(__dirname+'/public'));
-app.use('/_hads/highlight/', express.static(__dirname+'/node_modules/highlight.js/styles'));
-app.use('/_hads/octicons/', express.static(__dirname+'/node_modules/octicons/build/font'));
-app.use('/_hads/ace/', express.static(__dirname+'/node_modules/ace-builds/src-min/'));
-app.use('/_hads/mermaid/', express.static(__dirname+'/node_modules/mermaid/dist/'));
-app.use('/_hads/dropzone/', express.static(__dirname+'/node_modules/dropzone/dist/min/'));
+app.use('/_hads/', express.static(__dirname+'/public', { maxAge: cacheExpire }));
+app.use('/_hads/highlight/', express.static(__dirname+'/node_modules/highlight.js/styles', { maxAge: cacheExpire }));
+app.use('/_hads/octicons/', express.static(__dirname+'/node_modules/octicons/build/font', { maxAge: cacheExpire }));
+app.use('/_hads/ace/', express.static(__dirname+'/node_modules/ace-builds/src-min/', { maxAge: cacheExpire }));
+app.use('/_hads/mermaid/', express.static(__dirname+'/node_modules/mermaid/dist/', { maxAge: cacheExpire }));
+app.use('/_hads/dropzone/', express.static(__dirname+'/node_modules/dropzone/dist/min/', { maxAge: cacheExpire }));
 
 // client body request
 app.use(bodyParser.json());
@@ -165,8 +172,10 @@ const STYLESHEETS = ['/highlight/github.css', '/octicons/octicons.css', '/css/gi
 const SCRIPTS = ['/ace/ace.js', '/mermaid/mermaid.min.js', '/dropzone/dropzone.min.js', '/js/client.js'];
 
 // Disable XSS auditor to allow html injection in markdown
-if(args.production == false) {
+if(args.production === false) {
   app.use((req, res, next) => {
+    res.setHeader("Cache-Control", "private, max-age=0");
+    res.setHeader("Prama", "no-cache");
     res.setHeader('X-XSS-Protection', 0);
     process.nextTick(next);
   })
@@ -197,8 +206,12 @@ app.get('*', (req, res, next) => {
       contentPromise = renderer.renderSearch(query.search);
       icon = 'octicon-search';
     } else if (Helpers.hasQueryOption(query, 'raw') || Matcher.isImage(filePath)) {
+      if(args.production === true)
+        res.setHeader("Cache-Control", "public, max-age="+(cacheExpire/1000));
       return res.sendFile(filePath);
     } else if (Matcher.isMarkdown(filePath)) {
+      if(args.production === true)
+        res.setHeader("Cache-Control", "public, max-age="+(cacheExpire/1000));
       contentPromise = edit ? renderer.renderRaw(filePath) : renderer.renderFile(filePath);
       icon = 'octicon-file';
     } else if (Matcher.isSourceCode(filePath)) {
@@ -301,6 +314,9 @@ app.get('*', (req, res, next) => {
 
 if(args.production == false) {
   app.post('*', (req, res, next) => {
+    res.setHeader("Cache-Control", "private, max-age=0");
+    res.setHeader("Prama", "no-cache");
+    
     var route = Helpers.extractRoute(req.path);
     var filePath = path.join(rootPath, route);
 
