@@ -116,10 +116,14 @@ try {
   var files = fs.readdirSync(pDir)
   for(var a in files) {
     var file = files[a];
-    if(/\.js$/.test(file)) {
-      var pname = file.substr(0, file.length-3);
-      debug('Loading plugin '+pname+' from '+pDir+'/'+file);
-      (plugins[pname] = require(pDir+'/'+file))(app);
+    var dirName = pDir+'/'+file;
+    var fss = fs.statSync(dirName);
+
+    if(fss.isDirectory()) {
+      var hadsFile = dirName+'/hads.js';
+      fs.statSync(hadsFile);
+      debug('Loading plugin '+file+' from '+hadsFile);
+      (plugins[file] = require(hadsFile))(app);
     }
   }
 } catch(e) { /* error is useless */ }

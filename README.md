@@ -100,7 +100,7 @@ You can set your own template by creating a **__hads/** directory in your root p
 
 ### Creating a plugin
 
-Create **__hads/plugins** directory into your installation, create a file **__hads/plugins/test.js** and add the following lines in it:
+Create **__hads/plugins/myplugin** directory into your installation, create a file **__hads/plugins/myplugin/hads.js** and add the following lines in it:
 
 ```javascript
 module.exports = function(app) {
@@ -108,7 +108,7 @@ module.exports = function(app) {
 }
 ```
 
-The **app** variable is the Express.js object where you can add new routes.
+The **app** variable is the Express.js object where you can add new routes. You can add a **package.json** into your plugin directory if you need to add some dependencies.
 
 ## Updates
 
