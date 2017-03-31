@@ -123,7 +123,11 @@ try {
       var hadsFile = dirName+'/hads.js';
       fs.statSync(hadsFile);
       debug('Loading plugin '+file+' from '+hadsFile);
-      (plugins[file] = require(hadsFile))(app);
+      try {
+        (plugins[file] = require(hadsFile))(app);
+      } catch(e) {
+        console.log('Can not load '+file+' plugin: '+e.message)
+      }
     }
   }
 } catch(e) { /* error is useless */ }
