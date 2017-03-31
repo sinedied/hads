@@ -47,6 +47,7 @@ Options:
   -h, --host        Host address to bind to        [default: "localhost"]
   -i, --images-dir  Directory to store images      [default: "images"]
   -x, --production  Production Mode. No edition possible
+  -d, --directory   Specify a starting directory 
   -o, --open        Open default browser on start
   --help            Show this help
 ```
@@ -103,7 +104,7 @@ You can set your own template by creating a **__hads/** directory in your root p
 Create **__hads/plugins/myplugin** directory into your installation, create a file **__hads/plugins/myplugin/hads.js** and add the following lines in it:
 
 ```javascript
-module.exports = function(app) {
+module.exports = function(app, rewriteDirectory) {
 	console.log('hello world!');
 }
 ```

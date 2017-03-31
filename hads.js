@@ -31,6 +31,8 @@ var args = optimist
   .alias('x', 'production')
   .boolean('x')
   .describe('x', 'Production Mode. No edition possible')
+  .alias('d', 'directory')
+  .describe('d', 'Specify a starting directory')
   .alias('o', 'open')
   .boolean('o')
   .describe('o', 'Open default browser on start')
@@ -46,9 +48,29 @@ var docPath = args._[0] || './';
 var rootPath = path.resolve(docPath);
 var imagesPath = path.join(rootPath, Helpers.sanitizePath(args.i));
 var indexer = new Indexer(rootPath);
-var renderer = new Renderer(indexer);
+
+// Rendered
+var rewriteDirectory = args.directory ? args.directory : '';
+var renderer = new Renderer(indexer, rewriteDirectory);
+
+// Loaded plugins
 var plugins = {};
+
+// Express application
 var app = express();
+
+// rewrite starting directory
+if(rewriteDirectory.length > 0) {
+  app.use((req, res, next) => {
+    var rdl = rewriteDirectory.length;
+    if(rdl <= req.url.length) {
+        if(req.url.substr(0, rdl) == rewriteDirectory) {
+          req.url = req.url.substr(rdl);
+        }
+    }
+    process.nextTick(next);
+  })
+}
 
 // set express render engine to pug
 app.set('view engine', 'pug', {options: {resolv: function() {}}});
@@ -124,7 +146,7 @@ try {
       fs.statSync(hadsFile);
       debug('Loading plugin '+file+' from '+hadsFile);
       try {
-        (plugins[file] = require(hadsFile))(app);
+        (plugins[file] = require(hadsFile))(app, rewriteDirectory);
       } catch(e) {
         console.log('Can not load '+file+' plugin: '+e.message)
       }
@@ -151,8 +173,6 @@ if(args.production == false) {
 }
 
 app.get('*', (req, res, next) => {
-
-
   // NOTE: you don't need 'let' there, vars' scope are preserved
   var route = Helpers.extractRoute(req.path);
   var query = req.query || {};
@@ -197,6 +217,7 @@ app.get('*', (req, res, next) => {
           route: route,
           args: args,
           icon: icon,
+          directory: rewriteDirectory,
           plugins: [pugPlugin],
           search: search,
           content: content,
@@ -304,6 +325,7 @@ if(args.production == false) {
           route: route,
           icon: 'octicon-file',
           content: content,
+          directory: rewriteDirectory,
           plugins: [pugPlugin],
           args: args,
           styles: STYLESHEETS,
