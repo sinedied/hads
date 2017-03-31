@@ -26,7 +26,7 @@
 - 100% offline
 - Production Mode. No edition possible
 - Possibility to hook Templates and Public files
-
+- Load plugins from your local installation (useful to add contact form etc..)
 
 ## Usage
 
@@ -98,6 +98,17 @@ You can set your own template by creating a **__hads/** directory in your root p
  * **header.pug**: Header
  * **layout.pug**: General layout
 
+### Creating a plugin
+
+Create **__hads/plugins** directory into your installation, create a file **__hads/plugins/test.js** and add the following lines in it:
+
+```javascript
+module.exports = function(app) {
+	console.log('hello world!');
+}
+```
+
+The **app** variable is the Express.js object where you can add new routes.
 
 ## Updates
 
