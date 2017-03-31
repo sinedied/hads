@@ -142,7 +142,17 @@ const STYLESHEETS = ['/highlight/github.css', '/octicons/octicons.css', '/css/gi
   '/css/mermaid.neutral.css'];
 const SCRIPTS = ['/ace/ace.js', '/mermaid/mermaid.min.js', '/dropzone/dropzone.min.js', '/js/client.js'];
 
+// Disable XSS auditor to allow html injection in markdown
+if(args.production == false) {
+  app.use((req, res, next) => {
+    res.setHeader('X-XSS-Protection', 0);
+    process.nextTick(next);
+  })
+}
+
 app.get('*', (req, res, next) => {
+
+
   // NOTE: you don't need 'let' there, vars' scope are preserved
   var route = Helpers.extractRoute(req.path);
   var query = req.query || {};
