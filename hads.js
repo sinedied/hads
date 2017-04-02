@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug')('hads');
 const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require('fs'));
 const mkdirpAsync = Promise.promisify(require('mkdirp'));
@@ -16,7 +17,7 @@ const Renderer = require('./lib/renderer.js');
 const Helpers = require('./lib/helpers.js');
 const Indexer = require('./lib/indexer.js');
 
-let args = optimist
+var args = optimist
   .usage(`\n${pkg.name} ${pkg.version}\nUsage: $0 [root dir] [options]`)
   .alias('p', 'port')
   .describe('p', 'Port number to listen on')
@@ -27,6 +28,11 @@ let args = optimist
   .alias('i', 'images-dir')
   .describe('i', 'Directory to store images')
   .default('i', 'images')
+  .alias('x', 'production')
+  .boolean('x')
+  .describe('x', 'Production Mode. No edition possible')
+  .alias('d', 'directory')
+  .describe('d', 'Specify a starting directory')
   .alias('o', 'open')
   .boolean('o')
   .describe('o', 'Open default browser on start')
@@ -38,40 +44,158 @@ if (args.help || args._.length > 1) {
   process.exit();
 }
 
-// Find node_modules base path
-let modulesBasePath = require.resolve('highlight.js');
-modulesBasePath = modulesBasePath.substr(0, modulesBasePath.lastIndexOf('node_modules'));
+var docPath = args._[0] || './';
+var rootPath = path.resolve(docPath);
+var imagesPath = path.join(rootPath, Helpers.sanitizePath(args.i));
+var indexer = new Indexer(rootPath);
 
-let docPath = args._[0] || './';
-let rootPath = path.resolve(docPath);
-let imagesPath = path.join(rootPath, Helpers.sanitizePath(args.i));
-let indexer = new Indexer(rootPath);
-let renderer = new Renderer(indexer);
-let app = express();
+// Rendered
+var rewriteDirectory = args.directory ? args.directory : '';
+var renderer = new Renderer(indexer, rewriteDirectory);
 
-app.set('views', path.join(__dirname, '/views'));
-app.set('view engine', 'pug');
+// Loaded plugins
+var plugins = {};
+
+// Express application
+var app = express();
+
+// rewrite starting directory
+if(rewriteDirectory.length > 0) {
+  app.use((req, res, next) => {
+    var rdl = rewriteDirectory.length;
+    if(rdl <= req.url.length) {
+        if(req.url.substr(0, rdl) == rewriteDirectory) {
+          req.url = req.url.substr(rdl);
+        }
+    }
+    process.nextTick(next);
+  })
+}
+
+// set express render engine to pug
+app.set('view engine', 'pug', {options: {resolv: function() {}}});
+
+// check whether rootPath contains __hads/views
+try {
+  fs.statSync(rootPath+'/__hads/views');
+  var rootsView = [rootPath+'/__hads/views', __dirname+'/views'];
+} catch(e) {
+  // set default views
+  var rootsView = [__dirname+'/views'];
+}
+app.set('views', rootsView);
+
+// refound the internal puf resolver
+var pugPlugin = {
+  // hook pug resolver to lookup multiple view directories
+  resolve: (filename, source, options) => {
+    filename = filename.trim();
+    if (filename[0] !== '/' && !source)
+      throw new Error('the "filename" option is required to use includes and extends with "relative" paths');
+
+    if (filename[0] === '/' && !options.basedir)
+      throw new Error('the "basedir" option is required to use includes and extends with "absolute" paths');
+
+    // check path with priority
+    if(filename[0] === '/')
+      filename = path.join(options.basedir, filename);
+    else {
+      var org = filename;
+      for(var a=0; a<rootsView.length; a++) {
+        filename = path.join(rootsView[a], org);
+        try {
+          fs.statSync(filename);
+          break;
+        } catch(e) { /* nothing here */ }
+      }
+    }
+    return filename;
+  }
+};
+
+// define cache expire for static content
+var cacheExpire = 60*60*24;
+if(args.production !== true)
+  cacheExpire = 0;
+debug("Cache control set to "+cacheExpire+' seconds for static content');
+cacheExpire = cacheExpire*1000;
+
+// load rootPath __hads/public
+try {
+  fs.statSync(rootPath+'/__hads/public');
+  app.use('/_hads/', express.static(rootPath+'/__hads/public', { maxAge: cacheExpire }));
+} catch(e) { /* error is useless */ }
+
+// load default hads' static files
+app.use('/_hads/', express.static(__dirname+'/public', { maxAge: cacheExpire }));
+app.use('/_hads/highlight/', express.static(__dirname+'/node_modules/highlight.js/styles', { maxAge: cacheExpire }));
+app.use('/_hads/octicons/', express.static(__dirname+'/node_modules/octicons/build/font', { maxAge: cacheExpire }));
+app.use('/_hads/ace/', express.static(__dirname+'/node_modules/ace-builds/src-min/', { maxAge: cacheExpire }));
+app.use('/_hads/mermaid/', express.static(__dirname+'/node_modules/mermaid/dist/', { maxAge: cacheExpire }));
+app.use('/_hads/dropzone/', express.static(__dirname+'/node_modules/dropzone/dist/min/', { maxAge: cacheExpire }));
+
+// client body request
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-app.use('/_hads/', express.static(path.join(__dirname, '/public')));
-app.use('/_hads/highlight/', express.static(path.join(modulesBasePath, 'node_modules/highlight.js/styles')));
-app.use('/_hads/octicons/', express.static(path.join(modulesBasePath, 'node_modules/octicons/build/font')));
-app.use('/_hads/ace/', express.static(path.join(modulesBasePath, 'node_modules/ace-builds/src-min/')));
-app.use('/_hads/mermaid/', express.static(path.join(modulesBasePath, 'node_modules/mermaid/dist/')));
-app.use('/_hads/dropzone/', express.static(path.join(modulesBasePath, 'node_modules/dropzone/dist/min/')));
+
+// load application plugins in __hads/plugins
+try {
+  var pDir = rootPath+'/__hads/plugins';
+  fs.statSync(pDir);
+  var files = fs.readdirSync(pDir)
+  for(var a in files) {
+    var file = files[a];
+    var dirName = pDir+'/'+file;
+    var fss = fs.statSync(dirName);
+
+    if(fss.isDirectory()) {
+      var hadsFile = dirName+'/hads.js';
+      fs.statSync(hadsFile);
+      debug('Loading plugin '+file+' from '+hadsFile);
+      try {
+        (plugins[file] = require(hadsFile))(app, rewriteDirectory);
+      } catch(e) {
+        console.log('Can not load '+file+' plugin: '+e.message)
+      }
+    }
+  }
+} catch(e) { /* error is useless */ }
+
+// prevent local __hads installation to be public
+app.use('/__hads', (req, res, next) => {
+  res.status(403).send('Forbidden');
+})
 
 const ROOT_FILES = ['index.md', 'README.md', 'readme.md'];
 const STYLESHEETS = ['/highlight/github.css', '/octicons/octicons.css', '/css/github.css', '/css/style.css',
   '/css/mermaid.neutral.css'];
 const SCRIPTS = ['/ace/ace.js', '/mermaid/mermaid.min.js', '/dropzone/dropzone.min.js', '/js/client.js'];
 
+// Disable XSS auditor to allow html injection in markdown
+if(args.production === false) {
+  app.use((req, res, next) => {
+    res.setHeader("Cache-Control", "private, max-age=0");
+    res.setHeader("Prama", "no-cache");
+    res.setHeader('X-XSS-Protection', 0);
+    process.nextTick(next);
+  })
+}
+
 app.get('*', (req, res, next) => {
-  let route = Helpers.extractRoute(req.path);
-  let query = req.query || {};
-  let rootIndex = -1, mdIndex = -1;
-  let create = Helpers.hasQueryOption(query, 'create');
-  let edit = Helpers.hasQueryOption(query, 'edit') || create;
-  let filePath, icon, search, error, title, contentPromise;
+  // NOTE: you don't need 'let' there, vars' scope are preserved
+  var route = Helpers.extractRoute(req.path);
+  var query = req.query || {};
+  var rootIndex = -1, mdIndex = -1;
+  var create = Helpers.hasQueryOption(query, 'create');
+  var edit = Helpers.hasQueryOption(query, 'edit') || create;
+  var filePath, icon, search, error, title, contentPromise;
+
+  // check whether hads is in produdction mode then
+  // force edit and create to false
+  if(args.production == true) {
+    edit = false;
+    create = false;
+  }
 
   function renderPage() {
     if (error) {
@@ -82,8 +206,12 @@ app.get('*', (req, res, next) => {
       contentPromise = renderer.renderSearch(query.search);
       icon = 'octicon-search';
     } else if (Helpers.hasQueryOption(query, 'raw') || Matcher.isImage(filePath)) {
+      if(args.production === true)
+        res.setHeader("Cache-Control", "public, max-age="+(cacheExpire/1000));
       return res.sendFile(filePath);
     } else if (Matcher.isMarkdown(filePath)) {
+      if(args.production === true)
+        res.setHeader("Cache-Control", "public, max-age="+(cacheExpire/1000));
       contentPromise = edit ? renderer.renderRaw(filePath) : renderer.renderFile(filePath);
       icon = 'octicon-file';
     } else if (Matcher.isSourceCode(filePath)) {
@@ -100,7 +228,10 @@ app.get('*', (req, res, next) => {
         res.render(edit ? 'edit' : 'file', {
           title: title,
           route: route,
+          args: args,
           icon: icon,
+          directory: rewriteDirectory,
+          plugins: [pugPlugin],
           search: search,
           content: content,
           styles: STYLESHEETS,
@@ -137,7 +268,7 @@ app.get('*', (req, res, next) => {
       })
       .catch(() => {
         if (create) {
-          let fixedRoute = Helpers.ensureMarkdownExtension(route);
+          var fixedRoute = Helpers.ensureMarkdownExtension(route);
           if (fixedRoute !== route) {
             return res.redirect(fixedRoute + '?create=1');
           }
@@ -159,7 +290,7 @@ app.get('*', (req, res, next) => {
         } else if (rootIndex === -1 && path.basename(route) !== '' && (path.extname(route) === '' || mdIndex > -1) &&
             mdIndex < Matcher.MARKDOWN_EXTENSIONS.length - 1) {
           // Maybe it's a github-style link without extension, let's try adding one
-          let extension = Matcher.MARKDOWN_EXTENSIONS[++mdIndex];
+          var extension = Matcher.MARKDOWN_EXTENSIONS[++mdIndex];
           route = path.join(path.dirname(route), `${path.basename(route, path.extname(route))}.${extension}`);
           return tryProcessFile();
         } else {
@@ -180,61 +311,70 @@ app.get('*', (req, res, next) => {
   tryProcessFile();
 });
 
-app.post('*', (req, res, next) => {
-  let route = Helpers.extractRoute(req.path);
-  let filePath = path.join(rootPath, route);
 
-  fs.statAsync(filePath)
-    .then((stat) => {
-      let fileContent = req.body.content;
-      if (stat.isFile() && fileContent) {
-        if (process.platform !== 'win32') {
-          // www-form-urlencoded data always use CRLF line endings, so this is a quick fix
-          fileContent = fileContent.replace(/\r\n/g, '\n');
+if(args.production == false) {
+  app.post('*', (req, res, next) => {
+    res.setHeader("Cache-Control", "private, max-age=0");
+    res.setHeader("Prama", "no-cache");
+    
+    var route = Helpers.extractRoute(req.path);
+    var filePath = path.join(rootPath, route);
+
+    fs.statAsync(filePath)
+      .then((stat) => {
+        var fileContent = req.body.content;
+        if (stat.isFile() && fileContent) {
+          if (process.platform !== 'win32') {
+            // www-form-urlencoded data always use CRLF line endings, so this is a quick fix
+            fileContent = fileContent.replace(/\r\n/g, '\n');
+          }
+          return fs.writeFileAsync(filePath, fileContent);
         }
-        return fs.writeFileAsync(filePath, fileContent);
-      }
-    })
-    .then(() => {
-      indexer.updateIndexForFile(filePath);
-      return renderer.renderFile(filePath);
-    })
-    .then((content) => {
-      res.render('file', {
-        title: path.basename(filePath),
-        route: route,
-        icon: 'octicon-file',
-        content: content,
-        styles: STYLESHEETS,
-        scripts: SCRIPTS,
-        pkg: pkg
-      });
-    })
-    .catch(() => {
-      next();
-    })
-});
+      })
+      .then(() => {
+        indexer.updateIndexForFile(filePath);
+        return renderer.renderFile(filePath);
+      })
+      .then((content) => {
+        res.render('file', {
+          title: path.basename(filePath),
+          route: route,
+          icon: 'octicon-file',
+          content: content,
+          directory: rewriteDirectory,
+          plugins: [pugPlugin],
+          args: args,
+          styles: STYLESHEETS,
+          scripts: SCRIPTS,
+          pkg: pkg
+        });
+      })
+      .catch(() => {
+        next();
+      })
+  });
 
-app.post('/_hads/upload', [multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => { cb(null, imagesPath); },
-    filename: (req, file, cb) => {
-      mkdirpAsync(imagesPath).then(() => {
-        cb(null, shortId.generate() + path.extname(file.originalname))
-      });
+  app.post('/_hads/upload', [multer({
+    storage: multer.diskStorage({
+      destination: (req, file, cb) => { cb(null, imagesPath); },
+      filename: (req, file, cb) => {
+        mkdirpAsync(imagesPath).then(() => {
+          cb(null, shortId.generate() + path.extname(file.originalname))
+        });
+      }
+    }),
+    onFileUploadStart: (file) => !file.mimetype.match(/^image\//),
+    limits: {
+      fileSize: 1024 * 1024 * 10   // 10 MB
     }
-  }),
-  onFileUploadStart: (file) => !file.mimetype.match(/^image\//),
-  limits: {
-    fileSize: 1024 * 1024 * 10   // 10 MB
-  }
-}).single('file'), (req, res) => {
-  res.json(path.sep + path.relative(rootPath, req.file.path));
-}]);
+  }).single('file'), (req, res) => {
+    res.json(path.sep + path.relative(rootPath, req.file.path));
+  }]);
+}
 
 indexer.indexFiles().then(() => {
   app.listen(args.port, args.host, () => {
-    let serverUrl = `http://${args.host}:${args.port}`;
+    var serverUrl = `http://${args.host}:${args.port}`;
     console.log(`${pkg.name} ${pkg.version} serving at ${serverUrl} (press CTRL+C to exit)`);
 
     if (args.open) {

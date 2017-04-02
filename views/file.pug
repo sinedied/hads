@@ -4,9 +4,9 @@ block content
   .container
     .file
       .file-header
-        if icon === 'octicon-file'
+        if args.production == false && icon === 'octicon-file'
           .file-actions
-            a.muted-link(href=`${route}?edit=1`)
+            a.muted-link(href=`${directory}${route}?edit=1`)
               span.octicon.octicon-pencil
               |  Edit
         span.header-title
