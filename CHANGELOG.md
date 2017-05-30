@@ -1,3 +1,7 @@
+# 1.3.4
+
+- Fixed mermaid loop text color (PR #9)
+
 # 1.3.3
 
 + Added filter for files/folders starting with a dot
