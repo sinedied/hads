@@ -24,6 +24,7 @@
 - Diagrams and flowcharts using [Mermaid](http://knsv.github.io/mermaid/) syntax
 - Drag'n drop images
 - 100% offline
+- custom CSS style
 
 
 ## Usage
@@ -56,6 +57,8 @@ If no root dir is specified, `./` will be used.
  
 The server will automatically search for a file named `index.md`, `readme.md` or `README.md` on the specified
 documentation root and will use it as your home page.
+
+You can customize the CSS style in a file named `custom.css`.
 
 ### Table of contents
 
