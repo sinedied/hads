@@ -56,13 +56,14 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use('/_hads/', express.static(path.join(__dirname, '/public')));
 app.use('/_hads/highlight/', express.static(path.join(modulesBasePath, 'node_modules/highlight.js/styles')));
 app.use('/_hads/octicons/', express.static(path.join(modulesBasePath, 'node_modules/octicons/build/font')));
+app.use('/_hads/font-awesome/', express.static(path.join(modulesBasePath, 'node_modules/font-awesome')));
 app.use('/_hads/ace/', express.static(path.join(modulesBasePath, 'node_modules/ace-builds/src-min/')));
 app.use('/_hads/mermaid/', express.static(path.join(modulesBasePath, 'node_modules/mermaid/dist/')));
 app.use('/_hads/dropzone/', express.static(path.join(modulesBasePath, 'node_modules/dropzone/dist/min/')));
 
 const ROOT_FILES = ['index.md', 'README.md', 'readme.md'];
 const STYLESHEETS = ['/highlight/github.css', '/octicons/octicons.css', '/css/github.css', '/css/style.css',
-  '/css/mermaid.neutral.css'];
+  '/css/mermaid.neutral.css', '/font-awesome/css/font-awesome.css'];
 const SCRIPTS = ['/ace/ace.js', '/mermaid/mermaid.min.js', '/dropzone/dropzone.min.js', '/js/client.js'];
 
 app.get('*', (req, res, next) => {
