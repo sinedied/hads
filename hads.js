@@ -45,6 +45,7 @@ modulesBasePath = modulesBasePath.substr(0, modulesBasePath.lastIndexOf('node_mo
 let docPath = args._[0] || './';
 let rootPath = path.resolve(docPath);
 let imagesPath = path.join(rootPath, Helpers.sanitizePath(args.i));
+let customStylePath = path.join(rootPath, 'custom.css');
 let indexer = new Indexer(rootPath);
 let renderer = new Renderer(indexer);
 let app = express();
@@ -65,6 +66,12 @@ const ROOT_FILES = ['index.md', 'README.md', 'readme.md'];
 const STYLESHEETS = ['/highlight/github.css', '/octicons/octicons.css', '/css/github.css', '/css/style.css',
   '/css/mermaid.neutral.css', '/font-awesome/css/font-awesome.css'];
 const SCRIPTS = ['/ace/ace.js', '/mermaid/mermaid.min.js', '/dropzone/dropzone.min.js', '/js/client.js'];
+
+var customStyle = '';
+if (fs.existsSync(customStylePath)) {
+  var customStyle = fs.readFileSync(customStylePath).toString();
+}
+
 
 app.get('*', (req, res, next) => {
   let route = Helpers.extractRoute(req.path);
@@ -105,6 +112,7 @@ app.get('*', (req, res, next) => {
           search: search,
           content: content,
           styles: STYLESHEETS,
+          customStyle: customStyle,
           scripts: SCRIPTS,
           pkg: pkg
         });
@@ -207,6 +215,7 @@ app.post('*', (req, res, next) => {
         icon: 'octicon-file',
         content: content,
         styles: STYLESHEETS,
+        customStyle: customStyle,
         scripts: SCRIPTS,
         pkg: pkg
       });
