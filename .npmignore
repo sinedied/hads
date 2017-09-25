@@ -1,3 +1,5 @@
 test/
 .gitignore
 .npmignore
+.idea/
+.travis.yml

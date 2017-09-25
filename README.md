@@ -1,7 +1,9 @@
 # Hey it's Another Documentation Server! (hads)
 
 [![NPM version](https://img.shields.io/npm/v/hads.svg)](https://www.npmjs.com/package/hads)
+[![Build status](https://img.shields.io/travis/sinedied/hads/master.svg)](https://travis-ci.org/sinedied/hads)
 ![Node version](https://img.shields.io/node/v/hads.svg)
+[![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
 ![Downloads](https://img.shields.io/npm/dm/hads.svg)
 [![License](https://img.shields.io/npm/l/hads.svg)](LICENSE)
 
@@ -24,7 +26,7 @@
 - Diagrams and flowcharts using [Mermaid](http://knsv.github.io/mermaid/) syntax
 - Drag'n drop images
 - 100% offline
-- custom CSS style
+- Custom CSS style
 
 
 ## Usage

@@ -74,7 +74,7 @@ sequenceDiagram
   participant Bob
   Alice->John: Hello John, how are you?
   loop Healthcheck
-    John->John: Fight against hypochondria  
+    John->John: Fight against hypochondria
   end
   Note right of John: Rational thoughts prevail...
   John-->Alice: Great!
@@ -118,4 +118,24 @@ gantt
     Future task in critical line        :crit, 5d
     Create tests for renderer           :2d
     Add to mermaid                      :1d
+```
+
+### With [Font-Awesome](http://fontawesome.io) icons
+```mermaid
+graph TD;
+    A((A))-->B(B);
+    A-->C[click me];
+    B-->D[fa:fa-chrome test icon];
+    C-->D;
+click C "https://mermaidjs.github.io/demos.html" "Mermaid demos"
+```
+
+Source:
+```
+graph TD;
+    A((A))-->B(B);
+    A-->C[click me];
+    B-->D[fa:fa-chrome test icon];
+    C-->D;
+click C "https://mermaidjs.github.io/demos.html" "Mermaid demos"
 ```
