@@ -83,7 +83,6 @@ const STYLESHEETS = [
   '/octicons/octicons.css',
   '/css/github.css',
   '/css/style.css',
-  '/css/mermaid.neutral.css',
   '/font-awesome/css/font-awesome.css'
 ].concat(hasCustomCss ? [`/${customCssFile}`] : []);
 
