@@ -86,8 +86,8 @@ rect {
 }
 
 @media screen and (max-width: 768px) {
-  .header-search {
-    width: 200px;
+  .header .header-search {
+    width: auto;
   }
 }
 
