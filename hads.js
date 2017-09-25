@@ -3,7 +3,6 @@
 const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require('fs'));
 const mkdirpAsync = Promise.promisify(require('mkdirp'));
-const os = require('os');
 const path = require('path');
 const optimist = require('optimist');
 const express = require('express');
@@ -16,7 +15,7 @@ const Renderer = require('./lib/renderer.js');
 const Helpers = require('./lib/helpers.js');
 const Indexer = require('./lib/indexer.js');
 
-let args = optimist
+const args = optimist
   .usage(`\n${pkg.name} ${pkg.version}\nUsage: $0 [root dir] [options]`)
   .alias('p', 'port')
   .describe('p', 'Port number to listen on')
@@ -42,13 +41,15 @@ if (args.help || args._.length > 1) {
 let modulesBasePath = require.resolve('highlight.js');
 modulesBasePath = modulesBasePath.substr(0, modulesBasePath.lastIndexOf('node_modules'));
 
-let docPath = args._[0] || './';
-let rootPath = path.resolve(docPath);
-let imagesPath = path.join(rootPath, Helpers.sanitizePath(args.i));
-let customStylePath = path.join(rootPath, 'custom.css');
-let indexer = new Indexer(rootPath);
-let renderer = new Renderer(indexer);
-let app = express();
+const docPath = args._[0] || './';
+const rootPath = path.resolve(docPath);
+const imagesPath = path.join(rootPath, Helpers.sanitizePath(args.i));
+const customCssFile = 'custom.css';
+const customStylePath = path.join(rootPath, customCssFile);
+const hasCustomCss = fs.existsSync(customStylePath);
+const indexer = new Indexer(rootPath);
+const renderer = new Renderer(indexer);
+const app = express();
 
 app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'pug');
@@ -62,22 +63,36 @@ app.use('/_hads/ace/', express.static(path.join(modulesBasePath, 'node_modules/a
 app.use('/_hads/mermaid/', express.static(path.join(modulesBasePath, 'node_modules/mermaid/dist/')));
 app.use('/_hads/dropzone/', express.static(path.join(modulesBasePath, 'node_modules/dropzone/dist/min/')));
 
-const ROOT_FILES = ['index.md', 'README.md', 'readme.md'];
-const STYLESHEETS = ['/highlight/github.css', '/octicons/octicons.css', '/css/github.css', '/css/style.css',
-  '/css/mermaid.neutral.css', '/font-awesome/css/font-awesome.css'];
-const SCRIPTS = ['/ace/ace.js', '/mermaid/mermaid.min.js', '/dropzone/dropzone.min.js', '/js/client.js'];
-
-var customStyle = '';
-if (fs.existsSync(customStylePath)) {
-  var customStyle = fs.readFileSync(customStylePath).toString();
+if (hasCustomCss) {
+  app.use(`/_hads/${customCssFile}`, express.static(customStylePath));
 }
 
+const ROOT_FILES = [
+  'index.md',
+  'README.md',
+  'readme.md'
+];
+const SCRIPTS = [
+  '/ace/ace.js',
+  '/mermaid/mermaid.min.js',
+  '/dropzone/dropzone.min.js',
+  '/js/client.js'
+];
+const STYLESHEETS = [
+  '/highlight/github.css',
+  '/octicons/octicons.css',
+  '/css/github.css',
+  '/css/style.css',
+  '/css/mermaid.neutral.css',
+  '/font-awesome/css/font-awesome.css'
+].concat(hasCustomCss ? [`/${customCssFile}`] : []);
 
 app.get('*', (req, res, next) => {
   let route = Helpers.extractRoute(req.path);
-  let query = req.query || {};
-  let rootIndex = -1, mdIndex = -1;
-  let create = Helpers.hasQueryOption(query, 'create');
+  const query = req.query || {};
+  let rootIndex = -1;
+  let mdIndex = -1;
+  const create = Helpers.hasQueryOption(query, 'create');
   let edit = Helpers.hasQueryOption(query, 'edit') || create;
   let filePath, icon, search, error, title, contentPromise;
 
@@ -104,22 +119,20 @@ app.get('*', (req, res, next) => {
     }
 
     if (contentPromise) {
-      return contentPromise.then((content) => {
+      return contentPromise.then(content => {
         res.render(edit ? 'edit' : 'file', {
-          title: title,
-          route: route,
-          icon: icon,
-          search: search,
-          content: content,
+          title,
+          route,
+          icon,
+          search,
+          content,
           styles: STYLESHEETS,
-          customStyle: customStyle,
           scripts: SCRIPTS,
-          pkg: pkg
+          pkg
         });
       });
-    } else {
-      next();
     }
+    next();
   }
 
   function tryProcessFile() {
@@ -127,7 +140,7 @@ app.get('*', (req, res, next) => {
     filePath = path.join(rootPath, route);
 
     return fs.statAsync(filePath)
-      .then((stat) => {
+      .then(stat => {
         search = query.search && query.search.length > 0 ? query.search.trim() : null;
 
         if (stat.isDirectory() && !search && !error) {
@@ -135,18 +148,17 @@ app.get('*', (req, res, next) => {
             // Try to find a root file
             route = path.join(route, ROOT_FILES[++rootIndex]);
             return tryProcessFile();
-          } else {
-            route = '/';
-            title = 'Error';
-            error = `Cannot create file \`${filePath}\``;
           }
+          route = '/';
+          title = 'Error';
+          error = `Cannot create file \`${filePath}\``;
         }
 
         return renderPage();
       })
       .catch(() => {
         if (create) {
-          let fixedRoute = Helpers.ensureMarkdownExtension(route);
+          const fixedRoute = Helpers.ensureMarkdownExtension(route);
           if (fixedRoute !== route) {
             return res.redirect(fixedRoute + '?create=1');
           }
@@ -155,7 +167,7 @@ app.get('*', (req, res, next) => {
             .then(() => fs.writeFileAsync(filePath, ''))
             .then(() => indexer.updateIndexForFile(filePath))
             .then(tryProcessFile)
-            .catch((e) => {
+            .catch(e => {
               console.error(e);
               title = 'Error';
               error = `Cannot create file \`${filePath}\``;
@@ -168,21 +180,20 @@ app.get('*', (req, res, next) => {
         } else if (rootIndex === -1 && path.basename(route) !== '' && (path.extname(route) === '' || mdIndex > -1) &&
             mdIndex < Matcher.MARKDOWN_EXTENSIONS.length - 1) {
           // Maybe it's a github-style link without extension, let's try adding one
-          let extension = Matcher.MARKDOWN_EXTENSIONS[++mdIndex];
+          const extension = Matcher.MARKDOWN_EXTENSIONS[++mdIndex];
           route = path.join(path.dirname(route), `${path.basename(route, path.extname(route))}.${extension}`);
           return tryProcessFile();
-        } else {
-          if (path.dirname(route) === path.sep && rootIndex === ROOT_FILES.length - 1) {
-            error = '## No home page (╥﹏╥)\nDo you want to create an [index.md](/index.md?create=1) or ' +
-              '[readme.md](/readme.md?create=1) file perhaps?'
-          } else {
-            error = '## File not found ¯\\\\\\_(◕\\_\\_◕)_/¯\n> *There\'s a glitch in the matrix...*';
-          }
-          title = '404 Error';
-          route = '/';
-
-          return renderPage();
         }
+        if (path.dirname(route) === path.sep && rootIndex === ROOT_FILES.length - 1) {
+          error = '## No home page (╥﹏╥)\nDo you want to create an [index.md](/index.md?create=1) or ' +
+              '[readme.md](/readme.md?create=1) file perhaps?';
+        } else {
+          error = '## File not found ¯\\\\\\_(◕\\_\\_◕)_/¯\n> *There\'s a glitch in the matrix...*';
+        }
+        title = '404 Error';
+        route = '/';
+
+        return renderPage();
       });
   }
 
@@ -190,15 +201,15 @@ app.get('*', (req, res, next) => {
 });
 
 app.post('*', (req, res, next) => {
-  let route = Helpers.extractRoute(req.path);
-  let filePath = path.join(rootPath, route);
+  const route = Helpers.extractRoute(req.path);
+  const filePath = path.join(rootPath, route);
 
   fs.statAsync(filePath)
-    .then((stat) => {
+    .then(stat => {
       let fileContent = req.body.content;
       if (stat.isFile() && fileContent) {
         if (process.platform !== 'win32') {
-          // www-form-urlencoded data always use CRLF line endings, so this is a quick fix
+          // Www-form-urlencoded data always use CRLF line endings, so this is a quick fix
           fileContent = fileContent.replace(/\r\n/g, '\n');
         }
         return fs.writeFileAsync(filePath, fileContent);
@@ -208,33 +219,34 @@ app.post('*', (req, res, next) => {
       indexer.updateIndexForFile(filePath);
       return renderer.renderFile(filePath);
     })
-    .then((content) => {
+    .then(content => {
       res.render('file', {
         title: path.basename(filePath),
-        route: route,
+        route,
         icon: 'octicon-file',
-        content: content,
+        content,
         styles: STYLESHEETS,
-        customStyle: customStyle,
         scripts: SCRIPTS,
-        pkg: pkg
+        pkg
       });
     })
     .catch(() => {
       next();
-    })
+    });
 });
 
 app.post('/_hads/upload', [multer({
   storage: multer.diskStorage({
-    destination: (req, file, cb) => { cb(null, imagesPath); },
+    destination: (req, file, cb) => {
+      cb(null, imagesPath);
+    },
     filename: (req, file, cb) => {
       mkdirpAsync(imagesPath).then(() => {
-        cb(null, shortId.generate() + path.extname(file.originalname))
+        cb(null, shortId.generate() + path.extname(file.originalname));
       });
     }
   }),
-  onFileUploadStart: (file) => !file.mimetype.match(/^image\//),
+  onFileUploadStart: file => !file.mimetype.match(/^image\//),
   limits: {
     fileSize: 1024 * 1024 * 10   // 10 MB
   }
@@ -244,7 +256,7 @@ app.post('/_hads/upload', [multer({
 
 indexer.indexFiles().then(() => {
   app.listen(args.port, args.host, () => {
-    let serverUrl = `http://${args.host}:${args.port}`;
+    const serverUrl = `http://${args.host}:${args.port}`;
     console.log(`${pkg.name} ${pkg.version} serving at ${serverUrl} (press CTRL+C to exit)`);
 
     if (args.open) {

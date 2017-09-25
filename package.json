@@ -31,13 +31,14 @@
   "main": "hads.js",
   "scripts": {
     "start": "node hads.js ./test -o",
+    "test": "eslint eslint *.js lib/*.js",
     "postpublish": "git tag -a $npm_package_version -m '$npm_package_version' && git push --tags"
   },
   "bin": {
     "hads": "./bin/hads"
   },
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=6.0.0"
   },
   "dependencies": {
     "ace-builds": "^1.2.5",
@@ -62,5 +63,23 @@
     "shortid": "^2.2.6",
     "string-humanize": "^1.0.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "eslint": "^4.7.2",
+    "eslint-config-xo-space": "^0.16.0"
+  },
+  "eslintConfig": {
+    "extends": "xo-space/esnext",
+    "rules": {
+      "no-multi-spaces": [
+        "error",
+        { "ignoreEOLComments": true }
+      ],
+      "one-var": [
+        "error",
+        {
+          "initialized": "never"
+        }
+      ]
+    }
+  }
 }
