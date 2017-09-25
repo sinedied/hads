@@ -57,9 +57,9 @@
     "octicons": "^4.4.0",
     "open": "^0.0.5",
     "optimist": "^0.6.1",
-    "pug": "2.0.0-beta11",
+    "pug": "^2.0.0-rc.4",
     "recursive-readdir": "^2.1.0",
-    "remove-markdown": "^0.1.0",
+    "remove-markdown": "^0.2.2",
     "shortid": "^2.2.6",
     "string-humanize": "^1.0.0"
   },
@@ -72,7 +72,9 @@
     "rules": {
       "no-multi-spaces": [
         "error",
-        { "ignoreEOLComments": true }
+        {
+          "ignoreEOLComments": true
+        }
       ],
       "one-var": [
         "error",
