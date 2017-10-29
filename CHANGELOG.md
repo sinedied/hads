@@ -1,3 +1,7 @@
+# 1.4.1
+- Added link opening in a new tab for images (PR #19) - by @fabala
+- Fixed link inside link
+
 # 1.4.0
 - Added support for Font-Awesome icons in Mermaid graphs (PR #13) - by @thomasleveil
 - Added custom.css file support (PR #14) - by @thomasleveil
