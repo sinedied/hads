@@ -139,3 +139,13 @@ graph TD;
     C-->D;
 click C "https://mermaidjs.github.io/demos.html" "Mermaid demos"
 ```
+
+### Images
+
+Basic images, can be opened in new tab:
+
+![md](md.png)
+
+Image with link:
+
+[![md](md.png)](http://google.com)
