@@ -86,7 +86,7 @@ markdown, but using code blocks with the `mermaid` language specified, like this
         C-->D;
     ```
 
-Mermaid [configuration](https://mermaidjs.github.io/mermaidAPI.html) can be overridden on a given page using the global variable `MERMAID_CONFIG` in a `<script>` tag:
+Mermaid [configuration](https://mermaidjs.github.io/mermaidAPI.html) can be overridden on a given page using the global variable `MERMAID_CONFIG` in a `<script>` tag, for example:
 
 ```html
 <script>
