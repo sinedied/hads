@@ -93,6 +93,7 @@ app.get('*', (req, res, next) => {
   let mdIndex = -1;
   const create = Helpers.hasQueryOption(query, 'create');
   let edit = Helpers.hasQueryOption(query, 'edit') || create;
+  let statusCode = 200;
   let filePath, icon, search, error, title, contentPromise;
 
   function renderPage() {
@@ -119,6 +120,7 @@ app.get('*', (req, res, next) => {
 
     if (contentPromise) {
       return contentPromise.then(content => {
+        res.status(statusCode);
         res.render(edit ? 'edit' : 'file', {
           title,
           route,
@@ -151,6 +153,7 @@ app.get('*', (req, res, next) => {
           route = '/';
           title = 'Error';
           error = `Cannot create file \`${filePath}\``;
+          statusCode = 400;
         }
 
         return renderPage();
@@ -171,6 +174,7 @@ app.get('*', (req, res, next) => {
               title = 'Error';
               error = `Cannot create file \`${filePath}\``;
               route = '/';
+              statusCode = 400;
               return renderPage();
             });
         } else if (rootIndex !== -1 && rootIndex < ROOT_FILES.length - 1) {
@@ -191,6 +195,7 @@ app.get('*', (req, res, next) => {
         }
         title = '404 Error';
         route = '/';
+        statusCode = 404;
 
         return renderPage();
       });
