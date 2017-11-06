@@ -15,5 +15,5 @@ html
     each script in scripts
       script(src=`/_hads${script}`)
     script.
-      mermaid.initialize({startOnLoad: true, theme: 'neutral'});
+      mermaid.initialize(Object.assign({startOnLoad: true, theme: 'neutral'}, window.MERMAID_CONFIG || {}));
 
