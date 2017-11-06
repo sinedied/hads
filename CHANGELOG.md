@@ -1,3 +1,8 @@
+# 1.5.0
+- Added support for Mermaid config customization
+- Added proper HTTP status codes on error
+- Updated dropzone dependency
+
 # 1.4.1
 - Added link opening in a new tab for images (PR #19) - by @fabala
 - Fixed link inside link
