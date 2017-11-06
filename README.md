@@ -85,7 +85,15 @@ markdown, but using code blocks with the `mermaid` language specified, like this
         B-->D;
         C-->D;
     ```
-    
+
+Mermaid [configuration](https://mermaidjs.github.io/mermaidAPI.html) can be overridden on a given page using the global variable `MERMAID_CONFIG` in a `<script>` tag:
+
+```html
+<script>
+MERMAID_CONFIG = { theme: 'forest' };
+</script>
+```
+
 ## Updates
 
 See changelog [here](CHANGELOG)
