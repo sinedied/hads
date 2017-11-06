@@ -4,5 +4,9 @@ node_js:
   - '7'
   - '6'
 
+branches:
+  only:
+    - 'master'
+
 matrix:
   fast_finish: true
