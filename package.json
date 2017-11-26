@@ -44,6 +44,7 @@
     "ace-builds": "^1.2.9",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
+    "dateformat": "^3.0.0",
     "dropzone": "^5.2.0",
     "elasticlunr": "^0.9.5",
     "express": "^4.16.2",
