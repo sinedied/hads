@@ -122,6 +122,9 @@ app.get('*', (req, res, next) => {
 
     if (!lastModified) {
       fs.stat(filePath, (err, stats) => {
+        if (err) {
+          lastModified = 'unknown (error ' + err.code + ')';
+        }
         lastModified = dateFormat(stats.mtime, lastModifiedDateFormat);
       });
     }
@@ -235,6 +238,9 @@ app.post('*', (req, res, next) => {
     .then(content => {
       let lastModified;
       fs.stat(filePath, (err, stats) => {
+        if (err) {
+          lastModified = 'unknown (error ' + err.code + ')';
+        }
         lastModified = dateFormat(stats.mtime, lastModifiedDateFormat);
       });
 
