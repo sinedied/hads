@@ -9,6 +9,7 @@ const express = require('express');
 const multer = require('multer');
 const bodyParser = require('body-parser');
 const shortId = require('shortid');
+const dateFormat = require('dateformat');
 const pkg = require('./package.json');
 const Matcher = require('./lib/matcher.js');
 const Renderer = require('./lib/renderer.js');
@@ -50,6 +51,7 @@ const hasCustomCss = fs.existsSync(customStylePath);
 const indexer = new Indexer(rootPath);
 const renderer = new Renderer(indexer);
 const app = express();
+const lastModifiedDateFormat = "yyyy-mm-dd h:MM:ss";
 
 app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'pug');
@@ -94,7 +96,7 @@ app.get('*', (req, res, next) => {
   const create = Helpers.hasQueryOption(query, 'create');
   let edit = Helpers.hasQueryOption(query, 'edit') || create;
   let statusCode = 200;
-  let filePath, icon, search, error, title, contentPromise;
+  let filePath, icon, search, error, title, lastModified, contentPromise;
 
   function renderPage() {
     if (error) {
@@ -118,11 +120,18 @@ app.get('*', (req, res, next) => {
       title = search ? renderer.searchResults : path.basename(filePath);
     }
 
+    if (!lastModified) {
+      fs.stat(filePath, function(err, stats){
+        lastModified = dateFormat(stats.mtime, lastModifiedDateFormat);
+      });
+    }
+
     if (contentPromise) {
       return contentPromise.then(content => {
         res.status(statusCode);
         res.render(edit ? 'edit' : 'file', {
           title,
+          lastModified,
           route,
           icon,
           search,
@@ -224,8 +233,14 @@ app.post('*', (req, res, next) => {
       return renderer.renderFile(filePath);
     })
     .then(content => {
+      let lastModified;
+      fs.stat(filePath, function(err, stats){
+        lastModified = dateFormat(stats.mtime, lastModifiedDateFormat);
+      });
+
       res.render('file', {
         title: path.basename(filePath),
+        lastModified,
         route,
         icon: 'octicon-file',
         content,
