@@ -51,7 +51,7 @@ const hasCustomCss = fs.existsSync(customStylePath);
 const indexer = new Indexer(rootPath);
 const renderer = new Renderer(indexer);
 const app = express();
-const lastModifiedDateFormat = "yyyy-mm-dd h:MM:ss";
+const lastModifiedDateFormat = 'yyyy-mm-dd h:MM:ss';
 
 app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'pug');
@@ -121,7 +121,7 @@ app.get('*', (req, res, next) => {
     }
 
     if (!lastModified) {
-      fs.stat(filePath, function(err, stats){
+      fs.stat(filePath, (err, stats) => {
         lastModified = dateFormat(stats.mtime, lastModifiedDateFormat);
       });
     }
@@ -234,7 +234,7 @@ app.post('*', (req, res, next) => {
     })
     .then(content => {
       let lastModified;
-      fs.stat(filePath, function(err, stats){
+      fs.stat(filePath, (err, stats) => {
         lastModified = dateFormat(stats.mtime, lastModifiedDateFormat);
       });
 
