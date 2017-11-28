@@ -97,7 +97,7 @@ app.get('*', (req, res, next) => {
   let edit = Helpers.hasQueryOption(query, 'edit') || create;
   let statusCode = 200;
   let lastModified = '';
-  let filePath, icon, search, error, title, contentPromise;
+  let filePath, icon, search, error, title, contentPromise, fileInfoPromise;
 
   function renderPage() {
     if (error) {
