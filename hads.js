@@ -9,7 +9,7 @@ const express = require('express');
 const multer = require('multer');
 const bodyParser = require('body-parser');
 const shortId = require('shortid');
-const dateFormat = require('dateformat');
+const moment = require('moment');
 const pkg = require('./package.json');
 const Matcher = require('./lib/matcher.js');
 const Renderer = require('./lib/renderer.js');
@@ -51,7 +51,6 @@ const hasCustomCss = fs.existsSync(customStylePath);
 const indexer = new Indexer(rootPath);
 const renderer = new Renderer(indexer);
 const app = express();
-const lastModifiedDateFormat = 'yyyy-mm-dd HH:MM:ss';
 
 app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'pug');
@@ -124,7 +123,7 @@ app.get('*', (req, res, next) => {
     return fs.statAsync(filePath)
       .then(stat => {
         if (stat.isFile()) {
-          lastModified = dateFormat(stat.mtime, lastModifiedDateFormat);
+          lastModified = moment(stat.mtime).fromNow();
         }
         if (contentPromise) {
           return contentPromise.then(content => {
@@ -144,7 +143,7 @@ app.get('*', (req, res, next) => {
         }
         return next();
       })
-      .catch((err) => {
+      .catch(err => {
         console.error('error while retrieving file stats (error ' + err.code + ')');
       });
   }
@@ -242,7 +241,7 @@ app.post('*', (req, res, next) => {
           // Get the new last modified date
           let lastModified = '';
           if (stat.isFile()) {
-            lastModified = dateFormat(stat.mtime, lastModifiedDateFormat);
+            lastModified = moment(stat.mtime).fromNow();
           }
           return res.render('file', {
             title: path.basename(filePath),
