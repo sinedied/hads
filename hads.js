@@ -96,7 +96,8 @@ app.get('*', (req, res, next) => {
   const create = Helpers.hasQueryOption(query, 'create');
   let edit = Helpers.hasQueryOption(query, 'edit') || create;
   let statusCode = 200;
-  let filePath, icon, search, error, title, lastModified, contentPromise;
+  let lastModified = '';
+  let filePath, icon, search, error, title, contentPromise, fileInfoPromise;
 
   function renderPage() {
     if (error) {
@@ -120,31 +121,32 @@ app.get('*', (req, res, next) => {
       title = search ? renderer.searchResults : path.basename(filePath);
     }
 
-    if (!lastModified) {
-      fs.stat(filePath, (err, stats) => {
-        if (err) {
-          lastModified = 'unknown (error ' + err.code + ')';
+    return fs.statAsync(filePath)
+      .then(stat => {
+        if (stat.isFile()) {
+          lastModified = dateFormat(stat.mtime, lastModifiedDateFormat)
         }
-        lastModified = dateFormat(stats.mtime, lastModifiedDateFormat);
+        if (contentPromise) {
+          return contentPromise.then(content => {
+            res.status(statusCode);
+            res.render(edit ? 'edit' : 'file', {
+              title,
+              lastModified,
+              route,
+              icon,
+              search,
+              content,
+              styles: STYLESHEETS,
+              scripts: SCRIPTS,
+              pkg
+            });
+          });
+        }
+        return next();
+      })
+      .catch(() => {
+        console.error('error while retrieving file stats (error ' + err.code + ')');
       });
-    }
-
-    if (contentPromise) {
-      return contentPromise.then(content => {
-        res.status(statusCode);
-        res.render(edit ? 'edit' : 'file', {
-          title,
-          lastModified,
-          route,
-          icon,
-          search,
-          content,
-          styles: STYLESHEETS,
-          scripts: SCRIPTS,
-          pkg
-        });
-      });
-    }
     next();
   }
 
@@ -236,25 +238,25 @@ app.post('*', (req, res, next) => {
       return renderer.renderFile(filePath);
     })
     .then(content => {
-      let lastModified;
-      fs.stat(filePath, (err, stats) => {
-        if (err) {
-          lastModified = 'unknown (error ' + err.code + ')';
-        }
-        lastModified = dateFormat(stats.mtime, lastModifiedDateFormat);
-      });
-
-      res.render('file', {
-        title: path.basename(filePath),
-        lastModified,
-        route,
-        icon: 'octicon-file',
-        content,
-        styles: STYLESHEETS,
-        scripts: SCRIPTS,
-        pkg
-      });
-    })
+      return fs.statAsync(filePath)
+        .then(stat => {
+          // get the new last modified date
+          let lastModified = '';
+          if (stat.isFile()) {
+            lastModified = dateFormat(stat.mtime, lastModifiedDateFormat);
+          }
+          return res.render('file', {
+            title: path.basename(filePath),
+            lastModified,
+            route,
+            icon: 'octicon-file',
+            content,
+            styles: STYLESHEETS,
+            scripts: SCRIPTS,
+            pkg
+          });
+        })
+      })
     .catch(() => {
       next();
     });
