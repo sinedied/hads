@@ -97,7 +97,7 @@ app.get('*', (req, res, next) => {
   let edit = Helpers.hasQueryOption(query, 'edit') || create;
   let statusCode = 200;
   let lastModified = '';
-  let filePath, icon, search, error, title, contentPromise, fileInfoPromise;
+  let filePath, icon, search, error, title, contentPromise;
 
   function renderPage() {
     if (error) {
@@ -124,7 +124,7 @@ app.get('*', (req, res, next) => {
     return fs.statAsync(filePath)
       .then(stat => {
         if (stat.isFile()) {
-          lastModified = dateFormat(stat.mtime, lastModifiedDateFormat)
+          lastModified = dateFormat(stat.mtime, lastModifiedDateFormat);
         }
         if (contentPromise) {
           return contentPromise.then(content => {
@@ -144,10 +144,9 @@ app.get('*', (req, res, next) => {
         }
         return next();
       })
-      .catch(() => {
+      .catch(err => {
         console.error('error while retrieving file stats (error ' + err.code + ')');
       });
-    next();
   }
 
   function tryProcessFile() {
@@ -240,7 +239,7 @@ app.post('*', (req, res, next) => {
     .then(content => {
       return fs.statAsync(filePath)
         .then(stat => {
-          // get the new last modified date
+          // Get the new last modified date
           let lastModified = '';
           if (stat.isFile()) {
             lastModified = dateFormat(stat.mtime, lastModifiedDateFormat);
@@ -255,8 +254,8 @@ app.post('*', (req, res, next) => {
             scripts: SCRIPTS,
             pkg
           });
-        })
-      })
+        });
+    })
     .catch(() => {
       next();
     });
