@@ -51,7 +51,7 @@ const hasCustomCss = fs.existsSync(customStylePath);
 const indexer = new Indexer(rootPath);
 const renderer = new Renderer(indexer);
 const app = express();
-const lastModifiedDateFormat = 'yyyy-mm-dd h:MM:ss';
+const lastModifiedDateFormat = 'yyyy-mm-dd HH:MM:ss';
 
 app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'pug');
