@@ -7,7 +7,6 @@ const path = require('path');
 const optimist = require('optimist');
 const express = require('express');
 const multer = require('multer');
-const moment = require('moment');
 const bodyParser = require('body-parser');
 const shortId = require('shortid');
 const moment = require('moment');
