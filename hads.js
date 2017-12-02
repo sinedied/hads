@@ -9,6 +9,7 @@ const express = require('express');
 const multer = require('multer');
 const bodyParser = require('body-parser');
 const shortId = require('shortid');
+const moment = require('moment');
 const pkg = require('./package.json');
 const Matcher = require('./lib/matcher.js');
 const Renderer = require('./lib/renderer.js');
@@ -94,6 +95,7 @@ app.get('*', (req, res, next) => {
   const create = Helpers.hasQueryOption(query, 'create');
   let edit = Helpers.hasQueryOption(query, 'edit') || create;
   let statusCode = 200;
+  let lastModified = '';
   let filePath, icon, search, error, title, contentPromise;
 
   function renderPage() {
@@ -118,22 +120,32 @@ app.get('*', (req, res, next) => {
       title = search ? renderer.searchResults : path.basename(filePath);
     }
 
-    if (contentPromise) {
-      return contentPromise.then(content => {
-        res.status(statusCode);
-        res.render(edit ? 'edit' : 'file', {
-          title,
-          route,
-          icon,
-          search,
-          content,
-          styles: STYLESHEETS,
-          scripts: SCRIPTS,
-          pkg
-        });
+    return fs.statAsync(filePath)
+      .then(stat => {
+        if (stat.isFile()) {
+          lastModified = moment(stat.mtime).fromNow();
+        }
+        if (contentPromise) {
+          return contentPromise.then(content => {
+            res.status(statusCode);
+            res.render(edit ? 'edit' : 'file', {
+              title,
+              lastModified,
+              route,
+              icon,
+              search,
+              content,
+              styles: STYLESHEETS,
+              scripts: SCRIPTS,
+              pkg
+            });
+          });
+        }
+        return next();
+      })
+      .catch(err => {
+        console.error('error while retrieving file stats (error ' + err.code + ')');
       });
-    }
-    next();
   }
 
   function tryProcessFile() {
@@ -224,15 +236,24 @@ app.post('*', (req, res, next) => {
       return renderer.renderFile(filePath);
     })
     .then(content => {
-      res.render('file', {
-        title: path.basename(filePath),
-        route,
-        icon: 'octicon-file',
-        content,
-        styles: STYLESHEETS,
-        scripts: SCRIPTS,
-        pkg
-      });
+      return fs.statAsync(filePath)
+        .then(stat => {
+          // Get the new last modified date
+          let lastModified = '';
+          if (stat.isFile()) {
+            lastModified = moment(stat.mtime).fromNow();
+          }
+          return res.render('file', {
+            title: path.basename(filePath),
+            lastModified,
+            route,
+            icon: 'octicon-file',
+            content,
+            styles: STYLESHEETS,
+            scripts: SCRIPTS,
+            pkg
+          });
+        });
     })
     .catch(() => {
       next();
