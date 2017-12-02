@@ -48,6 +48,12 @@ body {
   font-size: 85%;
 }
 
+.file-modified {
+  font-weight: normal;
+  font-size: 90%;
+  color: #666;
+}
+
 .mermaid:not([data-processed='true']) {
   visibility: hidden;
 }

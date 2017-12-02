@@ -120,32 +120,34 @@ app.get('*', (req, res, next) => {
       title = search ? renderer.searchResults : path.basename(filePath);
     }
 
-    return fs.statAsync(filePath)
-      .then(stat => {
-        if (stat.isFile()) {
-          lastModified = moment(stat.mtime).fromNow();
-        }
-        if (contentPromise) {
-          return contentPromise.then(content => {
-            res.status(statusCode);
-            res.render(edit ? 'edit' : 'file', {
-              title,
-              lastModified,
-              route,
-              icon,
-              search,
-              content,
-              styles: STYLESHEETS,
-              scripts: SCRIPTS,
-              pkg
-            });
+    if (contentPromise) {
+      return fs.statAsync(filePath)
+        .then(stat => {
+          if (stat.isFile()) {
+            lastModified = moment(stat.mtime).fromNow();
+          }
+          return contentPromise;
+        })
+        .then(content => {
+          res.status(statusCode);
+          res.render(edit ? 'edit' : 'file', {
+            title,
+            lastModified,
+            route,
+            icon,
+            search,
+            content,
+            styles: STYLESHEETS,
+            scripts: SCRIPTS,
+            pkg
           });
-        }
-        return next();
-      })
-      .catch(err => {
-        console.error('error while retrieving file stats (error ' + err.code + ')');
-      });
+        })
+        .catch(err => {
+          console.error(`Error while retrieving file stats: ${err.code}`);
+          next();
+        });
+    }
+    return next();
   }
 
   function tryProcessFile() {
@@ -219,11 +221,13 @@ app.get('*', (req, res, next) => {
 app.post('*', (req, res, next) => {
   const route = Helpers.extractRoute(req.path);
   const filePath = path.join(rootPath, route);
+  let lastModified = '';
 
   fs.statAsync(filePath)
     .then(stat => {
       let fileContent = req.body.content;
       if (stat.isFile() && fileContent) {
+        lastModified = moment(stat.mtime).fromNow();
         if (process.platform !== 'win32') {
           // Www-form-urlencoded data always use CRLF line endings, so this is a quick fix
           fileContent = fileContent.replace(/\r\n/g, '\n');
@@ -235,26 +239,16 @@ app.post('*', (req, res, next) => {
       indexer.updateIndexForFile(filePath);
       return renderer.renderFile(filePath);
     })
-    .then(content => {
-      return fs.statAsync(filePath)
-        .then(stat => {
-          // Get the new last modified date
-          let lastModified = '';
-          if (stat.isFile()) {
-            lastModified = moment(stat.mtime).fromNow();
-          }
-          return res.render('file', {
-            title: path.basename(filePath),
-            lastModified,
-            route,
-            icon: 'octicon-file',
-            content,
-            styles: STYLESHEETS,
-            scripts: SCRIPTS,
-            pkg
-          });
-        });
-    })
+    .then(content => res.render('file', {
+      title: path.basename(filePath),
+      lastModified,
+      route,
+      icon: 'octicon-file',
+      content,
+      styles: STYLESHEETS,
+      scripts: SCRIPTS,
+      pkg
+    }))
     .catch(() => {
       next();
     });
