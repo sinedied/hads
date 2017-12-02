@@ -1,3 +1,6 @@
+# 1.5.1
+- Added last modified date (PR #25) - by @fabala
+
 # 1.5.0
 - Added support for Mermaid config customization
 - Added proper HTTP status codes on error
