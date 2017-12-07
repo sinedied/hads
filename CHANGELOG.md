@@ -1,3 +1,6 @@
+# 1.6.0
+- Added read-only mode (PR #26) - by @fabala
+
 # 1.5.1
 - Added last modified date (PR #25) - by @fabala
 
