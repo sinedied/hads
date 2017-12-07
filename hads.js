@@ -30,6 +30,9 @@ const args = optimist
   .alias('o', 'open')
   .boolean('o')
   .describe('o', 'Open default browser on start')
+  .alias('r', 'readonly')
+  .boolean('r')
+  .describe('r', 'Read-only mode (no add or edit feature)')
   .describe('help', 'Show this help')
   .argv;
 
@@ -133,6 +136,7 @@ app.get('*', (req, res, next) => {
           res.render(edit ? 'edit' : 'file', {
             title,
             lastModified,
+            readonly: args.readonly,
             route,
             icon,
             search,
@@ -218,60 +222,63 @@ app.get('*', (req, res, next) => {
   tryProcessFile();
 });
 
-app.post('*', (req, res, next) => {
-  const route = Helpers.extractRoute(req.path);
-  const filePath = path.join(rootPath, route);
-  let lastModified = '';
+if (!args.readonly) {
+  app.post('*', (req, res, next) => {
+    const route = Helpers.extractRoute(req.path);
+    const filePath = path.join(rootPath, route);
+    let lastModified = '';
 
-  fs.statAsync(filePath)
-    .then(stat => {
-      let fileContent = req.body.content;
-      if (stat.isFile() && fileContent) {
-        lastModified = moment(stat.mtime).fromNow();
-        if (process.platform !== 'win32') {
-          // Www-form-urlencoded data always use CRLF line endings, so this is a quick fix
-          fileContent = fileContent.replace(/\r\n/g, '\n');
+    fs.statAsync(filePath)
+      .then(stat => {
+        let fileContent = req.body.content;
+        if (stat.isFile() && fileContent) {
+          lastModified = moment(stat.mtime).fromNow();
+          if (process.platform !== 'win32') {
+            // Www-form-urlencoded data always use CRLF line endings, so this is a quick fix
+            fileContent = fileContent.replace(/\r\n/g, '\n');
+          }
+          return fs.writeFileAsync(filePath, fileContent);
         }
-        return fs.writeFileAsync(filePath, fileContent);
-      }
-    })
-    .then(() => {
-      indexer.updateIndexForFile(filePath);
-      return renderer.renderFile(filePath);
-    })
-    .then(content => res.render('file', {
-      title: path.basename(filePath),
-      lastModified,
-      route,
-      icon: 'octicon-file',
-      content,
-      styles: STYLESHEETS,
-      scripts: SCRIPTS,
-      pkg
-    }))
-    .catch(() => {
-      next();
-    });
-});
-
-app.post('/_hads/upload', [multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, imagesPath);
-    },
-    filename: (req, file, cb) => {
-      mkdirpAsync(imagesPath).then(() => {
-        cb(null, shortId.generate() + path.extname(file.originalname));
+      })
+      .then(() => {
+        indexer.updateIndexForFile(filePath);
+        return renderer.renderFile(filePath);
+      })
+      .then(content => res.render('file', {
+        title: path.basename(filePath),
+        lastModified,
+        readonly: args.readonly,
+        route,
+        icon: 'octicon-file',
+        content,
+        styles: STYLESHEETS,
+        scripts: SCRIPTS,
+        pkg
+      }))
+      .catch(() => {
+        next();
       });
+  });
+
+  app.post('/_hads/upload', [multer({
+    storage: multer.diskStorage({
+      destination: (req, file, cb) => {
+        cb(null, imagesPath);
+      },
+      filename: (req, file, cb) => {
+        mkdirpAsync(imagesPath).then(() => {
+          cb(null, shortId.generate() + path.extname(file.originalname));
+        });
+      }
+    }),
+    onFileUploadStart: file => !file.mimetype.match(/^image\//),
+    limits: {
+      fileSize: 1024 * 1024 * 10   // 10 MB
     }
-  }),
-  onFileUploadStart: file => !file.mimetype.match(/^image\//),
-  limits: {
-    fileSize: 1024 * 1024 * 10   // 10 MB
-  }
-}).single('file'), (req, res) => {
-  res.json(path.sep + path.relative(rootPath, req.file.path));
-}]);
+  }).single('file'), (req, res) => {
+    res.json(path.sep + path.relative(rootPath, req.file.path));
+  }]);
+}
 
 indexer.indexFiles().then(() => {
   app.listen(args.port, args.host, () => {
