@@ -30,6 +30,9 @@ const args = optimist
   .alias('o', 'open')
   .boolean('o')
   .describe('o', 'Open default browser on start')
+  .alias('r', 'readonly')
+  .boolean('r')
+  .describe('r', 'Read-only mode (no add or edit feature)')
   .describe('help', 'Show this help')
   .argv;
 
@@ -133,6 +136,7 @@ app.get('*', (req, res, next) => {
           res.render(edit ? 'edit' : 'file', {
             title,
             lastModified,
+            readonly: args.readonly,
             route,
             icon,
             search,
@@ -242,6 +246,7 @@ app.post('*', (req, res, next) => {
     .then(content => res.render('file', {
       title: path.basename(filePath),
       lastModified,
+      readonly: args.readonly,
       route,
       icon: 'octicon-file',
       content,
