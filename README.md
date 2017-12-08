@@ -48,6 +48,7 @@ Options:
   -h, --host        Host address to bind to        [default: "localhost"]
   -i, --images-dir  Directory to store images      [default: "images"]
   -o, --open        Open default browser on start
+  -r, --readonly    Read-only mode (no add or edit feature)
   --help            Show this help
 ```
 
