@@ -97,4 +97,4 @@ MERMAID_CONFIG = { theme: 'forest' };
 
 ## Updates
 
-See changelog [here](CHANGELOG)
+See changelog [here](CHANGELOG.md)
