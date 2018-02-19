@@ -195,16 +195,21 @@ app.get('*', (req, res, next) => {
               statusCode = 400;
               return renderPage();
             });
-        } else if (rootIndex !== -1 && rootIndex < ROOT_FILES.length - 1) {
+        }
+
+        if (rootIndex !== -1 && rootIndex < ROOT_FILES.length - 1) {
           route = path.join(path.dirname(route), ROOT_FILES[++rootIndex]);
           return tryProcessFile();
-        } else if (rootIndex === -1 && path.basename(route) !== '' && (path.extname(route) === '' || mdIndex > -1) &&
+        }
+
+        if (rootIndex === -1 && path.basename(route) !== '' && (path.extname(route) === '' || mdIndex > -1) &&
             mdIndex < Matcher.MARKDOWN_EXTENSIONS.length - 1) {
           // Maybe it's a github-style link without extension, let's try adding one
           const extension = Matcher.MARKDOWN_EXTENSIONS[++mdIndex];
           route = path.join(path.dirname(route), `${path.basename(route, path.extname(route))}.${extension}`);
           return tryProcessFile();
         }
+
         if (path.dirname(route) === path.sep && rootIndex === ROOT_FILES.length - 1) {
           error = '## No home page (╥﹏╥)\nDo you want to create an [index.md](/index.md?create=1) or ' +
               '[readme.md](/readme.md?create=1) file perhaps?';

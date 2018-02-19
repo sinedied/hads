@@ -32,7 +32,7 @@
   "scripts": {
     "start": "node hads.js ./test -o",
     "test": "eslint eslint *.js lib/*.js",
-    "postpublish": "git tag -a $npm_package_version -m '$npm_package_version' && git push --tags"
+    "postpublish": "git tag -a $npm_package_version -m \"$npm_package_version\" && git push --tags"
   },
   "bin": {
     "hads": "./bin/hads"
@@ -41,19 +41,19 @@
     "node": ">=6.0.0"
   },
   "dependencies": {
-    "ace-builds": "^1.2.9",
+    "ace-builds": "^1.3.1",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
-    "dropzone": "^5.2.0",
+    "dropzone": "^5.3.0",
     "elasticlunr": "^0.9.5",
     "express": "^4.16.2",
     "font-awesome": "^4.7.0",
     "highlight.js": "^9.12.0",
-    "lodash": "^4.17.4",
-    "marked": "^0.3.7",
-    "mermaid": "^7.1.0",
+    "lodash": "^4.17.5",
+    "marked": "^0.3.15",
+    "mermaid": "^7.1.2",
     "mkdirp": "^0.5.1",
-    "moment": "^2.19.3",
+    "moment": "^2.20.1",
     "multer": "^1.3.0",
     "octicons": "^4.4.0",
     "open": "^0.0.5",
@@ -65,8 +65,8 @@
     "string-humanize": "^1.0.0"
   },
   "devDependencies": {
-    "eslint": "^4.12.1",
-    "eslint-config-xo-space": "^0.17.0"
+    "eslint": "^4.18.0",
+    "eslint-config-xo-space": "^0.18.0"
   },
   "eslintConfig": {
     "extends": "xo-space/esnext",
