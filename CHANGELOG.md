@@ -1,3 +1,6 @@
+# 1.6.1
+- Updated dependencies
+
 # 1.6.0
 - Added read-only mode (PR #26) - by @fabala
 
