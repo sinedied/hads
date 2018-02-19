@@ -149,3 +149,7 @@ Basic images, can be opened in new tab:
 Image with link:
 
 [![md](md.png)](http://google.com)
+
+<script>
+MERMAID_CONFIG = { theme: 'forest' };
+</script>

@@ -1,4 +1,5 @@
 test/
+gh-pages/
 .gitignore
 .npmignore
 .idea/
