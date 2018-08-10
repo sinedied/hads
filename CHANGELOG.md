@@ -1,3 +1,9 @@
+# 1.7.0
+- Updated dependencies
+- Updated `marked` renderer to latest version, rendering may be slightly affected
+- Fixed "Last updated" text on search page
+- Replaced `open` module to remove critical vulnerability
+
 # 1.6.1
 - Updated dependencies
 
