@@ -31,7 +31,7 @@
   "main": "hads.js",
   "scripts": {
     "start": "node hads.js ./test -o",
-    "test": "eslint eslint *.js lib/*.js",
+    "test": "eslint *.js lib/*.js",
     "postpublish": "git tag -a $npm_package_version -m \"$npm_package_version\" && git push --tags"
   },
   "bin": {
@@ -41,32 +41,32 @@
     "node": ">=6.0.0"
   },
   "dependencies": {
-    "ace-builds": "^1.3.1",
+    "ace-builds": "^1.4.1",
     "bluebird": "^3.5.1",
-    "body-parser": "^1.18.2",
-    "dropzone": "^5.3.0",
+    "body-parser": "^1.18.3",
+    "dropzone": "^5.5.1",
     "elasticlunr": "^0.9.5",
-    "express": "^4.16.2",
+    "express": "^4.16.3",
     "font-awesome": "^4.7.0",
     "highlight.js": "^9.12.0",
-    "lodash": "^4.17.5",
-    "marked": "^0.3.15",
+    "lodash": "^4.17.10",
+    "marked": "^0.4.0",
     "mermaid": "^7.1.2",
     "mkdirp": "^0.5.1",
-    "moment": "^2.20.1",
-    "multer": "^1.3.0",
+    "moment": "^2.22.2",
+    "multer": "^1.3.1",
     "octicons": "^4.4.0",
-    "open": "^0.0.5",
+    "opn": "^5.3.0",
     "optimist": "^0.6.1",
-    "pug": "^2.0.0-rc.4",
-    "recursive-readdir": "^2.2.1",
-    "remove-markdown": "^0.2.2",
-    "shortid": "^2.2.8",
+    "pug": "^2.0.3",
+    "recursive-readdir": "^2.2.2",
+    "remove-markdown": "^0.3.0",
+    "shortid": "^2.2.12",
     "string-humanize": "^1.0.0"
   },
   "devDependencies": {
-    "eslint": "^4.18.0",
-    "eslint-config-xo-space": "^0.18.0"
+    "eslint": "^5.3.0",
+    "eslint-config-xo-space": "^0.20.0"
   },
   "eslintConfig": {
     "extends": "xo-space/esnext",

@@ -291,7 +291,7 @@ indexer.indexFiles().then(() => {
     console.log(`${pkg.name} ${pkg.version} serving at ${serverUrl} (press CTRL+C to exit)`);
 
     if (args.open) {
-      require('open')(serverUrl);
+      require('opn')(serverUrl);
     }
   });
 });
