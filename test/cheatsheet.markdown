@@ -12,15 +12,14 @@ Note that there is also a [Cheatsheet specific to Markdown Here](./Markdown-Here
 [Lists](#lists)
 [Links](#links)
 [Images](#images)
-[Code and Syntax Highlighting](#code)
+[Code and Syntax Highlighting](#code-and-syntax-highlighting)
 [Tables](#tables)
 [Blockquotes](#blockquotes)
-[Inline HTML](#html)
-[Horizontal Rule](#hr)
-[Line Breaks](#lines)
-[Youtube videos](#videos)
+[Inline HTML](#inline-html)
+[Horizontal Rule](#horizontal-rule)
+[Line Breaks](#line-breaks)
+[Youtube videos](#youtube-videos)
 
-<a name="headers"/>
 ## Headers
 
 ```no-highlight
@@ -55,7 +54,6 @@ Alt-H1
 Alt-H2
 ------
 
-<a name="emphasis"/>
 ## Emphasis
 
 ```no-highlight
@@ -77,7 +75,6 @@ Combined emphasis with **asterisks and _underscores_**.
 Strikethrough uses two tildes. ~~Scratch this.~~
 
 
-<a name="lists"/>
 ## Lists
 
 (In this example, leading and trailing spaces are shown with with dots: ⋅)
@@ -118,7 +115,6 @@ Strikethrough uses two tildes. ~~Scratch this.~~
 - Or minuses
 + Or pluses
 
-<a name="links"/>
 ## Links
 
 There are two ways to create links.
@@ -169,7 +165,6 @@ Some text to show that the reference links can follow later.
 [1]: http://slashdot.org
 [link text itself]: http://www.reddit.com
 
-<a name="images"/>
 ## Images
 
 ```no-highlight
@@ -194,7 +189,6 @@ Reference-style:
 
 [logo]: https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 2"
 
-<a name="code"/>
 ## Code and Syntax Highlighting
 
 Code blocks are part of the Markdown spec, but syntax highlighting isn't. However, many renderers -- like Github's and *Markdown Here* -- support syntax highlighting. Which languages are supported and how those language names should be written will vary from renderer to renderer. *Markdown Here* supports highlighting for dozens of languages (and not-really-languages, like diffs and HTTP headers); to see the complete list, and how to write the language names, see the [highlight.js demo page](http://softwaremaniacs.org/media/soft/highlight/test.html).
@@ -241,7 +235,6 @@ But let's throw in a <b>tag</b>.
 ```
 
 
-<a name="tables"/>
 ## Tables
 
 Tables aren't part of the core Markdown spec, but they are part of GFM and *Markdown Here* supports them. They are an easy way of adding tables to your email -- a task that would otherwise require copy-pasting from another application.
@@ -280,7 +273,6 @@ Markdown | Less | Pretty
 *Still* | `renders` | **nicely**
 1 | 2 | 3
 
-<a name="blockquotes"/>
 ## Blockquotes
 
 ```no-highlight
@@ -299,7 +291,6 @@ Quote break.
 
 > This is a very long line that will still be quoted properly when it wraps. Oh boy let's keep writing to make sure this is long enough to actually wrap for everyone. Oh, you can *put* **Markdown** into a blockquote.
 
-<a name="html"/>
 ## Inline HTML
 
 You can also use raw HTML in your Markdown, and it'll mostly work pretty well.
@@ -322,7 +313,6 @@ You can also use raw HTML in your Markdown, and it'll mostly work pretty well.
   <dd>Does *not* work **very** well. Use HTML <em>tags</em>.</dd>
 </dl>
 
-<a name="hr"/>
 ## Horizontal Rule
 
 ```
@@ -355,7 +345,6 @@ ___
 
 Underscores
 
-<a name="lines"/>
 ## Line Breaks
 
 My basic recommendation for learning how line breaks work is to experiment and discover -- hit &lt;Enter&gt; once (i.e., insert one newline), then hit it twice (i.e., insert two newlines), see what happens. You'll soon learn to get what you want. "Markdown Toggle" is your friend.
@@ -380,7 +369,6 @@ This line is only separated by a single newline, so it's a separate line in the 
 
 (Technical note: *Markdown Here* uses GFM line breaks, so there's no need to use MD's two-space line breaks.)
 
-<a name="videos"/>
 ## Youtube videos
 
 They can't be added directly but you can add an image with a link to the video like this:
