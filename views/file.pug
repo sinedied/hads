@@ -12,7 +12,8 @@ block content
         span.header-title
             span.octicon(class=icon)
             |  #{title}
-            span.file-info-divider
-            span.file-modified Last modified #{lastModified}
+            if (search == null)
+              span.file-info-divider
+              span.file-modified Last modified #{lastModified}
       .readme.instapaper_body(class={ 'search': search })
         div(class={ 'markdown-body': icon !== 'octicon-file-media'}) !{content}
