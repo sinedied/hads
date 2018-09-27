@@ -1,3 +1,7 @@
+# 1.7.1
+- Fixed wrong cursor position in editor (PR #33) - by @jamerson
+- Updated dependencies
+
 # 1.7.0
 - Updated dependencies
 - Updated `marked` renderer to latest version, rendering may be slightly affected
