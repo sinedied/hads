@@ -40,7 +40,7 @@ body {
 }
 
 .ace_editor {
-  font-family: 'Courier';
+  font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
   display: block;
   height: calc(100vh - 200px);
 }
