@@ -41,10 +41,6 @@ if (args.help || args._.length > 1) {
   process.exit();
 }
 
-// Find node_modules base path
-let modulesBasePath = require.resolve('highlight.js');
-modulesBasePath = modulesBasePath.substr(0, modulesBasePath.lastIndexOf('node_modules'));
-
 const docPath = args._[0] || './';
 const rootPath = path.resolve(docPath);
 const imagesPath = path.join(rootPath, Helpers.sanitizePath(args.i));
@@ -60,12 +56,22 @@ app.set('view engine', 'pug');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use('/_hads/', express.static(path.join(__dirname, '/public')));
-app.use('/_hads/highlight/', express.static(path.join(modulesBasePath, 'node_modules/highlight.js/styles')));
-app.use('/_hads/octicons/', express.static(path.join(modulesBasePath, 'node_modules/octicons/build/font')));
-app.use('/_hads/font-awesome/', express.static(path.join(modulesBasePath, 'node_modules/font-awesome')));
-app.use('/_hads/ace/', express.static(path.join(modulesBasePath, 'node_modules/ace-builds/src-min/')));
-app.use('/_hads/mermaid/', express.static(path.join(modulesBasePath, 'node_modules/mermaid/dist/')));
-app.use('/_hads/dropzone/', express.static(path.join(modulesBasePath, 'node_modules/dropzone/dist/min/')));
+
+const staticDirs = {
+  'highlight': ['highlight.js', 'styles'],
+  'octicons': ['octicons', 'build/font'],
+  'font-awesome': ['font-awesome', ''],
+  'ace': ['ace-builds', 'src-min'],
+  'mermaid': ['mermaid', 'dist'],
+  'dropzone': ['dropzone', 'dist/min']
+};
+
+Object.keys(staticDirs).forEach(key => {
+  const [modName, subDir] = staticDirs[key];
+  let basePath = require.resolve(`${modName}/package.json`);
+  basePath = basePath.substr(0, basePath.lastIndexOf('package.json'));
+  app.use('/_hads/' + key + '/', express.static(path.join(basePath, subDir)));
+});
 
 if (hasCustomCss) {
   app.use(`/_hads/${customCssFile}`, express.static(customStylePath));
