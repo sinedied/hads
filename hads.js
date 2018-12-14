@@ -58,12 +58,12 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use('/_hads/', express.static(path.join(__dirname, '/public')));
 
 const staticDirs = {
-  'highlight': ['highlight.js', 'styles'],
-  'octicons': ['octicons', 'build/font'],
+  highlight: ['highlight.js', 'styles'],
+  octicons: ['octicons', 'build/font'],
   'font-awesome': ['font-awesome', ''],
-  'ace': ['ace-builds', 'src-min'],
-  'mermaid': ['mermaid', 'dist'],
-  'dropzone': ['dropzone', 'dist/min']
+  ace: ['ace-builds', 'src-min'],
+  mermaid: ['mermaid', 'dist'],
+  dropzone: ['dropzone', 'dist/min']
 };
 
 Object.keys(staticDirs).forEach(key => {
