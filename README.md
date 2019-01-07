@@ -74,6 +74,13 @@ specified *root dir*. File and folder names will be *humanized* for better reada
 
 It is particularly useful on the home page to provide an overview of the available documentation for your project.
 
+The sorting of each index level is as follows:
+1. Any README.md, readme.md, or index.md is always at the top.
+2. All files and folders that are prefixed with a number (e.g. `001-abc` and `002 mno` and `003_xyz`) are next, sorted 
+by their respective prefix numbers. Note that the prefix numbers are stripped out in the index.
+3. All remaining files, sorted by their name.
+4. All remaining folders, sorted by their name.  
+
 ### Mermaid Diagrams and flowcharts
 
 You can use the [Mermaid](http://knsv.github.io/mermaid/) syntax to insert diagrams and flowcharts directly in your
