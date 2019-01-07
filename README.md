@@ -23,7 +23,7 @@
 - In-browser editor
 - Table of contents using Markdown extension `[[toc]]`
 - Navigation index using Markdown extension `[[index]]`
-- Diagrams and flowcharts using [Mermaid](http://knsv.github.io/mermaid/) syntax
+- Diagrams and flowcharts using [Mermaid](http://knsv.github.io/mermaid/) and [PlantUML](http://plantuml.com/) syntax
 - Drag'n drop images
 - 100% offline
 - Custom CSS style
@@ -74,10 +74,10 @@ specified *root dir*. File and folder names will be *humanized* for better reada
 
 It is particularly useful on the home page to provide an overview of the available documentation for your project.
 
-### Diagrams and flowcharts
+### Mermaid Diagrams and flowcharts
 
 You can use the [Mermaid](http://knsv.github.io/mermaid/) syntax to insert diagrams and flowcharts directly in your
-markdown, but using code blocks with the `mermaid` language specified, like this:
+markdown, by using code blocks with the `mermaid` language specified, like this:
 
     ```mermaid
     graph TD;
@@ -95,6 +95,47 @@ MERMAID_CONFIG = { theme: 'forest' };
 </script>
 ```
 
+### PlantUML Diagrams
+
+You can use the [PlantUML](http://plantuml.com/) syntax to insert diagrams and flowcharts directly in your
+markdown, by using code blocks with the `plantuml` or `puml` language specified, like this:
+
+    ```plantuml
+    @startuml
+    Alice -> Bob: Authentication Request
+    Bob --> Alice: Authentication Response
+    
+    Alice -> Bob: Another authentication Request
+    Alice <-- Bob: Another authentication Response
+    @enduml
+    ```
+    
+or 
+    
+    
+    ```puml
+    @startgantt
+    [Prototype design] lasts 15 days
+    [Test prototype] lasts 10 days
+    @endgantt
+    ```
+    
+Since PlantUML uses Graphviz/DOT, it is also possible to directly use the DOT language.
+
+    
+    ```puml
+    @startdot
+    digraph foo {
+      node [style=rounded]
+      node1 [shape=box]
+      node2 [fillcolor=yellow, style="rounded,filled", shape=diamond]
+      node3 [shape=record, label="{ a | b | c }"]
+    
+      node1 -> node2 -> node3
+    }
+    @enddot
+    ```
+    
 ## Updates
 
 See changelog [here](CHANGELOG.md)

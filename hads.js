@@ -10,6 +10,8 @@ const multer = require('multer');
 const bodyParser = require('body-parser');
 const shortId = require('shortid');
 const moment = require('moment');
+const plantuml = require('node-plantuml-vizjs');
+const LZString = require('lz-string');
 const pkg = require('./package.json');
 const Matcher = require('./lib/matcher.js');
 const Renderer = require('./lib/renderer.js');
@@ -89,6 +91,24 @@ const STYLESHEETS = [
   '/css/style.css',
   '/font-awesome/css/font-awesome.css'
 ].concat(hasCustomCss ? [`/${customCssFile}`] : []);
+
+app.get('/_hads/plantuml/png/:uml', (req, res) => {
+  res.set('Content-Type', 'image/png');
+
+  const decode = LZString.decompressFromEncodedURIComponent(req.params.uml);
+  const gen = plantuml.generate(decode, {format: 'png'});
+
+  gen.out.pipe(res);
+});
+
+app.get('/_hads/plantuml/svg/:uml', (req, res) => {
+  res.set('Content-Type', 'image/svg+xml');
+
+  const decode = LZString.decompressFromEncodedURIComponent(req.params.uml);
+  const gen = plantuml.generate(decode, {format: 'svg'});
+
+  gen.out.pipe(res);
+});
 
 app.get('*', (req, res, next) => {
   let route = Helpers.extractRoute(req.path);

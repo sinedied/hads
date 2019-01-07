@@ -140,7 +140,76 @@ graph TD;
 click C "https://mermaidjs.github.io/demos.html" "Mermaid demos"
 ```
 
-### Images
+## PlantUML graphs
+
+You can use any PlantUML diagram in your markdown with the `plantuml` or `puml` language.
+
+See [PlantUML Language Specification](http://plantuml.com/sitemap-language-specification)
+
+```plantuml
+@startuml
+
+abstract class AbstractList
+abstract AbstractCollection
+interface List
+interface Collection
+
+List <|-- AbstractList
+Collection <|-- AbstractCollection
+
+Collection <|- List
+AbstractCollection <|- AbstractList
+AbstractList <|-- ArrayList
+
+class ArrayList {
+  Object[] elementData
+  size()
+}
+
+enum TimeUnit {
+  DAYS
+  HOURS
+  MINUTES
+}
+
+annotation SuppressWarnings
+
+@enduml
+```
+
+Source:
+```
+@startuml
+
+abstract class AbstractList
+abstract AbstractCollection
+interface List
+interface Collection
+
+List <|-- AbstractList
+Collection <|-- AbstractCollection
+
+Collection <|- List
+AbstractCollection <|- AbstractList
+AbstractList <|-- ArrayList
+
+class ArrayList {
+  Object[] elementData
+  size()
+}
+
+enum TimeUnit {
+  DAYS
+  HOURS
+  MINUTES
+}
+
+annotation SuppressWarnings
+
+@enduml
+```
+
+## Images
 
 Basic images, can be opened in new tab:
 
