@@ -135,6 +135,7 @@ app.get('*', (req, res, next) => {
           if (stat.isFile()) {
             lastModified = moment(stat.mtime).fromNow();
           }
+
           return contentPromise;
         })
         .then(content => {
@@ -157,6 +158,7 @@ app.get('*', (req, res, next) => {
           next();
         });
     }
+
     return next();
   }
 
@@ -174,6 +176,7 @@ app.get('*', (req, res, next) => {
             route = path.join(route, ROOT_FILES[++rootIndex]);
             return tryProcessFile();
           }
+
           route = '/';
           title = 'Error';
           error = `Cannot create file \`${filePath}\``;
@@ -222,6 +225,7 @@ app.get('*', (req, res, next) => {
         } else {
           error = '## File not found ¯\\\\\\_(◕\\_\\_◕)_/¯\n> *There\'s a glitch in the matrix...*';
         }
+
         title = '404 Error';
         route = '/';
         statusCode = 404;
@@ -248,6 +252,7 @@ if (!args.readonly) {
             // Www-form-urlencoded data always use CRLF line endings, so this is a quick fix
             fileContent = fileContent.replace(/\r\n/g, '\n');
           }
+
           return fs.writeFileAsync(filePath, fileContent);
         }
       })
