@@ -1,3 +1,7 @@
+# 1.7.2
+- FIx install issue with `highlight.js` package (#41)
+- Updated dependencies
+
 # 1.7.0
 - Updated dependencies
 - Updated `marked` renderer to latest version, rendering may be slightly affected
