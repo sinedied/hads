@@ -1,3 +1,8 @@
+# 1.7.3
+- Fix crashing on highlighting an unsupported language (PR #43) - by @igorskh
+- Fix unescaped characters in TOC links
+- Updated dependencies
+
 # 1.7.2
 - FIx install issue with `highlight.js` package (#41)
 - Updated dependencies
