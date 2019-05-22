@@ -1,6 +1,9 @@
+# 1.7.2
+- FIx install issue with `highlight.js` package (#41)
+- Updated dependencies
+
 # 1.7.1
 - Fixed wrong cursor position in editor (PR #33) - by @jamerson
-- Updated dependencies
 
 # 1.7.0
 - Updated dependencies
