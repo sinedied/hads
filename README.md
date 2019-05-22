@@ -98,3 +98,6 @@ MERMAID_CONFIG = { theme: 'forest' };
 ## Updates
 
 See changelog [here](CHANGELOG.md)
+
+## Variants
+- [hads-plantuml](https://www.npmjs.com/package/hads-plantuml): Adds PlantUML support for diagrams
