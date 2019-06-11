@@ -1,8 +1,6 @@
 'use strict';
 
-const Promise = require('bluebird');
-const fs = Promise.promisifyAll(require('fs'));
-const mkdirpAsync = Promise.promisify(require('mkdirp'));
+const fs = require('fs-extra');
 const path = require('path');
 const optimist = require('optimist');
 const express = require('express');
@@ -130,7 +128,7 @@ app.get('*', (req, res, next) => {
     }
 
     if (contentPromise) {
-      return fs.statAsync(filePath)
+      return fs.stat(filePath)
         .then(stat => {
           if (stat.isFile()) {
             lastModified = moment(stat.mtime).fromNow();

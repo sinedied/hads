@@ -38,16 +38,16 @@
     "hads": "./bin/hads"
   },
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=8.0.0"
   },
   "dependencies": {
     "ace-builds": "^1.4.3",
-    "bluebird": "^3.5.3",
     "body-parser": "^1.19.0",
     "dropzone": "^5.5.1",
     "elasticlunr": "^0.9.5",
     "express": "^4.16.4",
     "font-awesome": "^4.7.0",
+    "fs-extra": "^8.0.1",
     "highlight.js": "^9.15.6",
     "lodash": "^4.17.11",
     "marked": "^0.6.1",
