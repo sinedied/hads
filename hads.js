@@ -9,6 +9,8 @@ const bodyParser = require('body-parser');
 const shortId = require('shortid');
 const moment = require('moment');
 const pkg = require('./package.json');
+const pug = require('pug');
+const globby = require('globby');
 const Matcher = require('./lib/matcher.js');
 const Renderer = require('./lib/renderer.js');
 const Helpers = require('./lib/helpers.js');
@@ -18,7 +20,7 @@ const args = optimist
   .usage(`\n${pkg.name} ${pkg.version}\nUsage: $0 [root dir] [options]`)
   .alias('p', 'port')
   .describe('p', 'Port number to listen on')
-  .default('p', 4040)
+  .default('p', 4040) // eslint-disable-line no-magic-numbers
   .alias('h', 'host')
   .describe('h', 'Host address to bind to')
   .default('h', 'localhost')
@@ -31,55 +33,59 @@ const args = optimist
   .alias('r', 'readonly')
   .boolean('r')
   .describe('r', 'Read-only mode (no add or edit feature)')
+  .alias('e', 'export')
+  .describe('e', 'Export static html')
   .describe('help', 'Show this help')
   .argv;
 
 if (args.help || args._.length > 1) {
   optimist.showHelp(console.log);
-  process.exit();
+  process.exit(); // eslint-disable-line no-process-exit
 }
 
-const docPath = args._[0] || './';
-const rootPath = path.resolve(docPath);
-const imagesPath = path.join(rootPath, Helpers.sanitizePath(args.i));
-const customCssFile = 'custom.css';
-const customStylePath = path.join(rootPath, customCssFile);
-const hasCustomCss = fs.existsSync(customStylePath);
-const indexer = new Indexer(rootPath);
-const renderer = new Renderer(indexer);
-const app = express();
-
-app.set('views', path.join(__dirname, '/views'));
-app.set('view engine', 'pug');
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
-app.use('/_hads/', express.static(path.join(__dirname, '/public')));
-
-const staticDirs = {
-  highlight: ['highlight.js', 'styles'],
-  octicons: ['octicons', 'build/font'],
-  'font-awesome': ['font-awesome', ''],
-  ace: ['ace-builds', 'src-min'],
-  mermaid: ['mermaid', 'dist'],
-  dropzone: ['dropzone', 'dist/min']
-};
-
-Object.keys(staticDirs).forEach(key => {
-  const [modName, subDir] = staticDirs[key];
-  let basePath = require.resolve(`${modName}/package.json`);
-  basePath = basePath.substr(0, basePath.lastIndexOf('package.json'));
-  app.use('/_hads/' + key + '/', express.static(path.join(basePath, subDir)));
-});
-
-if (hasCustomCss) {
-  app.use(`/_hads/${customCssFile}`, express.static(customStylePath));
-}
-
-const ROOT_FILES = [
+const INDEXES = [
   'index.md',
   'README.md',
   'readme.md'
 ];
+const ICONS = {
+  alert: 'octicon-alert',
+  file: 'octicon-file',
+  search: 'octicon-search',
+  fileCode: 'octicon-file-code'
+};
+const STYLESHEET = 'custom.css';
+const PATHS = {
+  documentation: args._[0] || './',
+  public: path.join(__dirname, 'public'),
+  views: path.join(__dirname, 'views'),
+  /* eslint-disable no-return-assign */
+  get code() {
+    delete this.code;
+    return this.code = path.join(this.root, '**', `*.{${Matcher.getCode().join(',')}}`);
+  },
+  get customStylesheet() {
+    delete this.customStylesheet;
+    return this.customStylesheet = path.join(this.root, STYLESHEET);
+  },
+  get export() {
+    delete this.export;
+    return this.export = path.join(this.root, args.export === true ? 'public' : args.export);
+  },
+  get hads() {
+    delete this.hads;
+    return this.hads = path.join(this.export, '_hads');
+  },
+  get images() {
+    delete this.images;
+    return this.images = path.join(this.root, Helpers.sanitizePath(args.i));
+  },
+  get root() {
+    delete this.root;
+    return this.root = path.resolve(this.documentation);
+  }
+  /* eslint-enable no-return-assign */
+};
 const SCRIPTS = [
   '/ace/ace.js',
   '/mermaid/mermaid.min.js',
@@ -92,7 +98,102 @@ const STYLESHEETS = [
   '/css/github.css',
   '/css/style.css',
   '/font-awesome/css/font-awesome.css'
-].concat(hasCustomCss ? [`/${customCssFile}`] : []);
+].concat(fs.existsSync(PATHS.customStylesheet) ? [`/${STYLESHEET}`] : []);
+
+const indexer = new Indexer(PATHS.root);
+const renderer = new Renderer(indexer, {
+  isExport: args.export
+});
+
+if (args.export) {
+  args.export = args.export === true ? './public' : args.export;
+
+  (async () => {
+    await fs.emptyDir(PATHS.export);
+
+    const [documentation, code] = await Promise.all([
+      indexer.indexFiles().then(files => files.map(file => file.file)),
+      globby(PATHS.code).then(paths => paths.map(path => path.replace(PATHS.root, '')))
+    ]);
+
+    documentation
+      .concat(code)
+      .forEach(async file => {
+        const dir = path.dirname(file);
+        const ext = path.extname(file);
+        const base = path.basename(file, ext);
+        const src = path.join(PATHS.documentation, file);
+        const content = Matcher.isMarkdown(file) ?
+          await renderer.renderFile(src) :
+          await renderer.renderCode(src);
+        const template = path.join(PATHS.views, 'file.pug');
+        const stat = await fs.stat(src);
+        const html = pug.renderFile(template, {
+          content,
+          pkg,
+          lastModified: moment(stat.mtime).fromNow(),
+          route: Helpers.extractRoute(file),
+          icon: ICONS.file,
+          readonly: true,
+          scripts: SCRIPTS,
+          static: true,
+          styles: STYLESHEETS,
+          title: path.basename(src)
+        });
+        const buffer = Buffer.from(html);
+        const array = new Uint8Array(buffer);
+        const dest = path.join(dir, `${base}.html`);
+        const isIndex = INDEXES.find(filename => filename.startsWith(base));
+        await fs.mkdirp(path.join(PATHS.export, dir));
+        fs.writeFile(path.join(PATHS.export, dest), array);
+
+        if (isIndex) {
+          const dest = path.join(dir, 'index.html');
+          fs.writeFile(path.join(PATHS.export, dest), array);
+        }
+      });
+
+    // We `await` because we'll get EEXIST if this and the copy to
+    // the same directory in Helpers.processPackages are unresolved.
+    await fs.copy(PATHS.public, PATHS.hads);
+
+    if (await fs.exists(PATHS.customStylesheet)) {
+      fs.copy(path.join(PATHS.root, STYLESHEET), path.join(PATHS.hads, STYLESHEET));
+    }
+
+    Helpers.processPackages((alias, path$) => {
+      const dest = path.join(PATHS.hads, alias);
+      fs.copy(path$, dest);
+    });
+
+    globby(path.join(PATHS.root, '**', `*.{${Matcher.getImages().join(',')}}`))
+      .then(images => {
+        images.map(file => {
+          const dest = file.replace(PATHS.root, '');
+          return fs.copy(file, path.join(PATHS.export, dest));
+        });
+      });
+  })();
+
+  return;
+}
+
+const app = express();
+app.set('views', PATHS.views);
+app.set('view engine', 'pug');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+app.use('/_hads/', express.static(path.join(__dirname, '/public')));
+
+Helpers.processPackages((alias, path$) => {
+  app.use('/_hads/' + alias + '/', express.static(path$));
+});
+
+if (fs.existsSync(PATHS.customStylesheet)) {
+  app.use(`/_hads/${STYLESHEET}`, express.static(PATHS.customStylesheet));
+}
 
 app.get('*', (req, res, next) => {
   let route = Helpers.extractRoute(req.path);
@@ -109,18 +210,18 @@ app.get('*', (req, res, next) => {
     if (error) {
       edit = false;
       contentPromise = Promise.resolve(renderer.renderMarkdown(error));
-      icon = 'octicon-alert';
+      icon = ICONS.alert;
     } else if (search) {
       contentPromise = renderer.renderSearch(query.search);
-      icon = 'octicon-search';
+      icon = ICONS.search;
     } else if (Helpers.hasQueryOption(query, 'raw') || Matcher.isImage(filePath)) {
       return res.sendFile(filePath);
     } else if (Matcher.isMarkdown(filePath)) {
       contentPromise = edit ? renderer.renderRaw(filePath) : renderer.renderFile(filePath);
-      icon = 'octicon-file';
-    } else if (Matcher.isSourceCode(filePath)) {
-      contentPromise = renderer.renderSourceCode(filePath, path.extname(filePath).replace('.', ''));
-      icon = 'octicon-file-code';
+      icon = ICONS.file;
+    } else if (Matcher.isCode(filePath)) {
+      contentPromise = renderer.renderCode(filePath);
+      icon = ICONS.fileCode;
     }
 
     if (!title) {
@@ -162,23 +263,23 @@ app.get('*', (req, res, next) => {
 
   function tryProcessFile() {
     contentPromise = null;
-    filePath = path.join(rootPath, route);
+    filePath = path.join(PATHS.root, route);
 
-    return fs.statAsync(filePath)
+    return fs.stat(filePath)
       .then(stat => {
         search = query.search && query.search.length > 0 ? query.search.trim() : null;
 
         if (stat.isDirectory() && !search && !error) {
           if (!create) {
             // Try to find a root file
-            route = path.join(route, ROOT_FILES[++rootIndex]);
+            route = path.join(route, INDEXES[++rootIndex]);
             return tryProcessFile();
           }
 
           route = '/';
           title = 'Error';
           error = `Cannot create file \`${filePath}\``;
-          statusCode = 400;
+          statusCode = 400; // eslint-disable-line no-magic-numbers
         }
 
         return renderPage();
@@ -190,8 +291,8 @@ app.get('*', (req, res, next) => {
             return res.redirect(fixedRoute + '?create=1');
           }
 
-          return mkdirpAsync(path.dirname(filePath))
-            .then(() => fs.writeFileAsync(filePath, ''))
+          return fs.mkdirp(path.dirname(filePath))
+            .then(() => fs.writeFile(filePath, ''))
             .then(() => indexer.updateIndexForFile(filePath))
             .then(tryProcessFile)
             .catch(e => {
@@ -199,13 +300,13 @@ app.get('*', (req, res, next) => {
               title = 'Error';
               error = `Cannot create file \`${filePath}\``;
               route = '/';
-              statusCode = 400;
+              statusCode = 400; // eslint-disable-line no-magic-numbers
               return renderPage();
             });
         }
 
-        if (rootIndex !== -1 && rootIndex < ROOT_FILES.length - 1) {
-          route = path.join(path.dirname(route), ROOT_FILES[++rootIndex]);
+        if (rootIndex !== -1 && rootIndex < INDEXES.length - 1) {
+          route = path.join(path.dirname(route), INDEXES[++rootIndex]);
           return tryProcessFile();
         }
 
@@ -217,7 +318,7 @@ app.get('*', (req, res, next) => {
           return tryProcessFile();
         }
 
-        if (path.dirname(route) === path.sep && rootIndex === ROOT_FILES.length - 1) {
+        if (path.dirname(route) === path.sep && rootIndex === INDEXES.length - 1) {
           error = '## No home page (╥﹏╥)\nDo you want to create an [index.md](/index.md?create=1) or ' +
               '[readme.md](/readme.md?create=1) file perhaps?';
         } else {
@@ -226,7 +327,7 @@ app.get('*', (req, res, next) => {
 
         title = '404 Error';
         route = '/';
-        statusCode = 404;
+        statusCode = 404; // eslint-disable-line no-magic-numbers
 
         return renderPage();
       });
@@ -238,10 +339,10 @@ app.get('*', (req, res, next) => {
 if (!args.readonly) {
   app.post('*', (req, res, next) => {
     const route = Helpers.extractRoute(req.path);
-    const filePath = path.join(rootPath, route);
+    const filePath = path.join(PATHS.root, route);
     let lastModified = '';
 
-    fs.statAsync(filePath)
+    fs.stat(filePath)
       .then(stat => {
         let fileContent = req.body.content;
         if (stat.isFile() && fileContent) {
@@ -251,8 +352,10 @@ if (!args.readonly) {
             fileContent = fileContent.replace(/\r\n/g, '\n');
           }
 
-          return fs.writeFileAsync(filePath, fileContent);
+          return fs.writeFile(filePath, fileContent);
         }
+
+        return null;
       })
       .then(() => {
         indexer.updateIndexForFile(filePath);
@@ -277,20 +380,21 @@ if (!args.readonly) {
   app.post('/_hads/upload', [multer({
     storage: multer.diskStorage({
       destination: (req, file, cb) => {
-        cb(null, imagesPath);
+        cb(null, PATHS.images);
       },
       filename: (req, file, cb) => {
-        mkdirpAsync(imagesPath).then(() => {
+        fs.mkdirp(PATHS.images).then(() => {
           cb(null, shortId.generate() + path.extname(file.originalname));
         });
       }
     }),
     onFileUploadStart: file => !file.mimetype.match(/^image\//),
     limits: {
+      // eslint-disable-next-line no-magic-numbers
       fileSize: 1024 * 1024 * 10   // 10 MB
     }
   }).single('file'), (req, res) => {
-    res.json(path.sep + path.relative(rootPath, req.file.path));
+    res.json(path.sep + path.relative(PATHS.root, req.file.path));
   }]);
 }
 

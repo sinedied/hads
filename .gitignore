@@ -1,4 +1,5 @@
 node_modules/
+test/public/
 npm-debug.log
 .idea/*
 !.idea/runConfigurations/

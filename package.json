@@ -1,6 +1,6 @@
 {
   "name": "hads",
-  "version": "1.7.3",
+  "version": "2.0.0",
   "description": "Fast web server allowing to browse, search and edit project documentation written in Markdown",
   "repository": {
     "type": "git",
@@ -45,14 +45,14 @@
     "body-parser": "^1.19.0",
     "dropzone": "^5.5.1",
     "elasticlunr": "^0.9.5",
-    "express": "^4.16.4",
+    "express": "^4.17.1",
     "font-awesome": "^4.7.0",
     "fs-extra": "^8.0.1",
-    "highlight.js": "^9.15.6",
+    "globby": "^9.2.0",
+    "highlight.js": "^9.15.8",
     "lodash": "^4.17.11",
     "marked": "^0.6.1",
     "mermaid": "^8.0.0",
-    "mkdirp": "^0.5.1",
     "moment": "^2.24.0",
     "multer": "^1.4.1",
     "octicons": "^4.4.0",
@@ -70,6 +70,9 @@
   },
   "eslintConfig": {
     "extends": "xo-space/esnext",
+    "parserOptions": {
+      "sourceType": "script"
+    },
     "rules": {
       "no-multi-spaces": [
         "error",
