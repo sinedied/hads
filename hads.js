@@ -70,7 +70,7 @@ const PATHS = {
   },
   get export() {
     delete this.export;
-    return this.export = path.join(this.root, args.export === true ? 'public' : args.export);
+    return this.export = path.join(process.cwd(), args.export === true ? 'public' : args.export);
   },
   get hads() {
     delete this.hads;
