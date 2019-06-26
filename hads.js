@@ -131,7 +131,6 @@ if (args.export) {
         const html = pug.renderFile(template, {
           content,
           pkg,
-          lastModified: moment(stat.mtime).fromNow(),
           route: Helpers.extractRoute(file),
           icon: ICONS.file,
           readonly: true,
