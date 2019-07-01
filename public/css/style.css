@@ -15,6 +15,11 @@ body {
   font-weight: 600;
 }
 
+.file-info-divider {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
 .file > h3 {
   border: none;
 }

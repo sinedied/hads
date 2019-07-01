@@ -49,6 +49,7 @@ Options:
   -i, --images-dir  Directory to store images      [default: "images"]
   -o, --open        Open default browser on start
   -r, --readonly    Read-only mode (no add or edit feature)
+  -e, --export      Export static HTML             [default: "./public"]
   --help            Show this help
 ```
 
@@ -57,7 +58,7 @@ If no root dir is specified, `./` will be used.
 ## Extras
 
 ### Home page
- 
+
 The server will automatically search for a file named `index.md`, `readme.md` or `README.md` on the specified
 documentation root and will use it as your home page.
 

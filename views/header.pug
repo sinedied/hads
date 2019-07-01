@@ -1,15 +1,16 @@
-.header
-  .container.clearfix
-    a.header-logo-invertocat(href='/')
-      span.mega-octicon.octicon-book
-    .header-search
-      form(method='GET', action='/')
-        .inline-wrapper
-          label.form-control.header-search-wrapper
-            input.form-control.header-search-input(type='search', name='search', placeholder='Search', value=search)
-    ul.header-nav.float-right
-      if !readonly
-        li.header-nav-item
-          button.btn-link.header-nav-link(onclick='hads.showAdd()')
-            span.octicon.octicon-plus
-            | Add
+if !static
+  .header
+    .container.clearfix
+      a.header-logo-invertocat(href='/')
+        span.mega-octicon.octicon-book
+      .header-search
+        form(method='GET', action='/')
+          .inline-wrapper
+            label.form-control.header-search-wrapper
+              input.form-control.header-search-input(type='search', name='search', placeholder='Search', value=search)
+      ul.header-nav.float-right
+        if !readonly
+          li.header-nav-item
+            button.btn-link.header-nav-link(onclick='hads.showAdd()')
+              span.octicon.octicon-plus
+              | Add

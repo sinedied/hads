@@ -12,7 +12,7 @@ block content
         span.header-title
             span.octicon(class=icon)
             |  #{title}
-            if (search == null)
+            if search == null && lastModified
               span.file-info-divider
               span.file-modified Last modified #{lastModified}
       .readme.instapaper_body(class={ 'search': search })

@@ -1,3 +1,10 @@
+# 2.0.0
+- Added static HTML export option
+- Bumped Node.js requirement to `node >= 8`
+- Replaced Bluebird and mkdirp with fs-extra
+- Updated dependencies
+- Linter fixes
+
 # 1.7.3
 - Fix crashing on highlighting an unsupported language (PR #43) - by @igorskh
 - Fix unescaped characters in TOC links

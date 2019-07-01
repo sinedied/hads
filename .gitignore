@@ -1,6 +1,8 @@
 node_modules/
+test/public/
 npm-debug.log
 .idea/*
 !.idea/runConfigurations/
 !.idea/codeStyleSettings.xml
 .DS_Store
+export-test
