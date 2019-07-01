@@ -3,3 +3,4 @@ test/
 .npmignore
 .idea/
 .travis.yml
+export-test/
