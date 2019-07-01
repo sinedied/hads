@@ -111,6 +111,14 @@ if (args.export) {
   (async () => {
     await fs.emptyDir(PATHS.export);
 
+    globby(path.join(PATHS.root, '**', `*.{${Matcher.getImages().join(',')}}`))
+      .then(images => {
+        images.map(file => {
+          const dest = file.replace(PATHS.root, '');
+          return fs.copy(file, path.join(PATHS.export, dest));
+        });
+      });
+
     const [documentation, code] = await Promise.all([
       indexer.indexFiles().then(files => files.map(file => file.file)),
       globby(PATHS.code).then(paths => paths.map(path => path.replace(PATHS.root, '')))
@@ -163,14 +171,6 @@ if (args.export) {
       const dest = path.join(PATHS.hads, alias);
       fs.copy(path$, dest);
     });
-
-    globby(path.join(PATHS.root, '**', `*.{${Matcher.getImages().join(',')}}`))
-      .then(images => {
-        images.map(file => {
-          const dest = file.replace(PATHS.root, '');
-          return fs.copy(file, path.join(PATHS.export, dest));
-        });
-      });
   })();
 
   return;
