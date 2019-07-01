@@ -127,7 +127,6 @@ if (args.export) {
           await renderer.renderFile(src) :
           await renderer.renderCode(src);
         const template = path.join(PATHS.views, 'file.pug');
-        const stat = await fs.stat(src);
         const html = pug.renderFile(template, {
           content,
           pkg,
