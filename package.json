@@ -56,6 +56,7 @@
     "mermaid": "^8.2.3",
     "moment": "^2.24.0",
     "multer": "^1.4.2",
+    "normalize-path": "^3.0.0",
     "octicons": "^4.4.0",
     "open": "^6.4.0",
     "optimist": "^0.6.1",
