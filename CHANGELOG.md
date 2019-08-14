@@ -1,4 +1,6 @@
 # 2.0.1
+- Fix export links on Windows
+- Update dependencies (fix #51)
 
 # 2.0.0
 - Add static HTML export option (PR #45) - by @rhucle
