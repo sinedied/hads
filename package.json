@@ -22,7 +22,10 @@
     "mermaid",
     "nodejs"
   ],
-  "author": "Yohan Lasorsa",
+  "author": {
+    "name": "Yohan Lasorsa",
+    "url": "https://twitter.com/sinedied"
+  },
   "license": "MIT",
   "homepage": "https://github.com/sinedied/hads",
   "bugs": {
