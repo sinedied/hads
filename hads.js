@@ -20,7 +20,7 @@ const args = optimist
   .usage(`\n${pkg.name} ${pkg.version}\nUsage: $0 [root dir] [options]`)
   .alias('p', 'port')
   .describe('p', 'Port number to listen on')
-  .default('p', 4040) // eslint-disable-line no-magic-numbers
+  .default('p', 4040)
   .alias('h', 'host')
   .describe('h', 'Host address to bind to')
   .default('h', 'localhost')
@@ -40,7 +40,7 @@ const args = optimist
 
 if (args.help || args._.length > 1) {
   optimist.showHelp(console.log);
-  process.exit(); // eslint-disable-line no-process-exit
+  process.exit();
 }
 
 const INDEXES = [
@@ -277,7 +277,7 @@ app.get('*', (req, res, next) => {
           route = '/';
           title = 'Error';
           error = `Cannot create file \`${filePath}\``;
-          statusCode = 400; // eslint-disable-line no-magic-numbers
+          statusCode = 400;
         }
 
         return renderPage();
@@ -298,7 +298,7 @@ app.get('*', (req, res, next) => {
               title = 'Error';
               error = `Cannot create file \`${filePath}\``;
               route = '/';
-              statusCode = 400; // eslint-disable-line no-magic-numbers
+              statusCode = 400;
               return renderPage();
             });
         }
@@ -325,7 +325,7 @@ app.get('*', (req, res, next) => {
 
         title = '404 Error';
         route = '/';
-        statusCode = 404; // eslint-disable-line no-magic-numbers
+        statusCode = 404;
 
         return renderPage();
       });
@@ -388,7 +388,6 @@ if (!args.readonly) {
     }),
     onFileUploadStart: file => !file.mimetype.match(/^image\//),
     limits: {
-      // eslint-disable-next-line no-magic-numbers
       fileSize: 1024 * 1024 * 10   // 10 MB
     }
   }).single('file'), (req, res) => {
@@ -402,7 +401,7 @@ indexer.indexFiles().then(() => {
     console.log(`${pkg.name} ${pkg.version} serving at ${serverUrl} (press CTRL+C to exit)`);
 
     if (args.open) {
-      require('open')(serverUrl);
+      require('open')(serverUrl, {url: true});
     }
   });
 });
