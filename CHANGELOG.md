@@ -1,3 +1,7 @@
+# 2.0.2
+- Update dependencies
+- Fix extra \r character on bin file 
+
 # 2.0.1
 - Fix export links on Windows
 - Update dependencies (fix #51)
