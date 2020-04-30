@@ -1,3 +1,8 @@
+# 2.1.0
+- Add ordering in [[index]] (#58)
+- Fix search links with files containing spaces
+- Update dependencies
+
 # 2.0.2
 - Update dependencies
 - Fix extra \r character on bin file 
