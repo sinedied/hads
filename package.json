@@ -42,7 +42,7 @@
     "hads": "./bin/hads"
   },
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=10.0.0"
   },
   "dependencies": {
     "ace-builds": "^1.4.11",
@@ -51,7 +51,7 @@
     "elasticlunr": "^0.9.5",
     "express": "^4.17.1",
     "font-awesome": "^4.7.0",
-    "fs-extra": "^8.1.0",
+    "fs-extra": "^9.0.1",
     "globby": "^11.0.0",
     "highlight.js": "^10.0.1",
     "lodash": "^4.17.15",
@@ -63,7 +63,7 @@
     "octicons": "^4.4.0",
     "open": "^7.0.3",
     "optimist": "^0.6.1",
-    "pug": "^2.0.4",
+    "pug": "^3.0.0",
     "recursive-readdir": "^2.2.2",
     "remove-markdown": "^0.3.0",
     "shortid": "^2.2.15",
