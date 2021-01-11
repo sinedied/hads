@@ -126,7 +126,7 @@ There are two ways to create links.
 
 [I'm a reference-style link][Arbitrary case-insensitive reference text]
 
-[I'm a relative reference to a repository file](../blob/master/LICENSE)
+[I'm a relative reference to a repository file](../blob/main/LICENSE)
 
 [You can use numbers for reference-style link definitions][1]
 
@@ -149,7 +149,7 @@ Some text to show that the reference links can follow later.
 
 [I'm a reference-style link][Arbitrary case-insensitive reference text]
 
-[I'm a relative reference to a repository file](../blob/master/LICENSE)
+[I'm a relative reference to a repository file](../blob/main/LICENSE)
 
 [You can use numbers for reference-style link definitions][1]
 
