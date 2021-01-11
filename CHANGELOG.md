@@ -1,3 +1,13 @@
+# [3.0.0](https://github.com/sinedied/hads/compare/2.1.0...3.0.0) (2021-01-11)
+
+
+* fix!: update dependencies ([931d23e](https://github.com/sinedied/hads/commit/931d23e0ce46d098f8fb958979176dcaf7d589dd))
+
+
+### BREAKING CHANGES
+
+* Require Node.js >= 10
+
 # 2.1.0
 - Add ordering in [[index]] (#58)
 - Fix search links with files containing spaces
