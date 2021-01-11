@@ -36,7 +36,7 @@
     "start": "node hads.js ./test -o",
     "export": "node hads.js ./test -e export-test && npx http-server export-test",
     "test": "eslint *.js lib/*.js",
-    "release:check": "npm run release -s -- --dry-run"
+    "release:check": "semantic-release --dry-run"
   },
   "bin": {
     "hads": "./bin/hads"
