@@ -1,7 +1,7 @@
 # Hey it's Another Documentation Server! (hads)
 
 [![NPM version](https://img.shields.io/npm/v/hads.svg)](https://www.npmjs.com/package/hads)
-[![Build Status](https://sinedied.visualstudio.com/oss-pipelines/_apis/build/status/sinedied.hads?branchName=master)](https://sinedied.visualstudio.com/oss-pipelines/_build/latest?definitionId=3&branchName=master&WT.mc_id=sinediedhads-github-yolasors)
+[![Build Status](https://github.com/sinedied/hads/workflows/build/badge.svg)](https://github.com/sinedied/hads/actions)
 ![Node version](https://img.shields.io/node/v/hads.svg)
 [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
 ![Downloads](https://img.shields.io/npm/dm/hads.svg)
