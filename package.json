@@ -92,5 +92,12 @@
         }
       ]
     }
-  }
+  },
+  "files": [
+    "hads.js",
+    "bin",
+    "lib",
+    "public",
+    "views"
+  ]
 }

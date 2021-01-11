@@ -1,6 +1,0 @@
-test/
-.gitignore
-.npmignore
-.idea/
-.azure-pipelines.yml
-export-test/
