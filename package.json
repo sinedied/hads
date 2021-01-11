@@ -36,7 +36,7 @@
     "start": "node hads.js ./test -o",
     "export": "node hads.js ./test -e export-test && npx http-server export-test",
     "test": "eslint *.js lib/*.js",
-    "postpublish": "git tag -a $npm_package_version -m \"$npm_package_version\" && git push --tags"
+    "release:check": "npm run release -s -- --dry-run"
   },
   "bin": {
     "hads": "./bin/hads"
@@ -71,7 +71,9 @@
   },
   "devDependencies": {
     "eslint": "^6.8.0",
-    "eslint-config-xo-space": "^0.24.0"
+    "eslint-config-xo-space": "^0.24.0",
+    "semantic-release": "^17.3.1",
+    "semantic-release-npm-github": "^1.0.4"
   },
   "eslintConfig": {
     "extends": "xo-space/esnext",
@@ -92,6 +94,10 @@
         }
       ]
     }
+  },
+  "release": {
+    "extends": "semantic-release-npm-github",
+    "branches": "main"
   },
   "files": [
     "hads.js",
