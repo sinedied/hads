@@ -42,7 +42,7 @@
     "hads": "./bin/hads"
   },
   "engines": {
-    "node": ">=10.0.0"
+    "node": ">=12.0.0"
   },
   "dependencies": {
     "ace-builds": "^1.4.11",
@@ -50,9 +50,9 @@
     "elasticlunr": "^0.9.5",
     "express": "^4.17.1",
     "font-awesome": "^4.7.0",
-    "fs-extra": "^9.0.1",
+    "fs-extra": "^10.0.0",
     "globby": "^11.0.0",
-    "highlight.js": "^10.0.1",
+    "highlight.js": "^11.2.0",
     "lodash": "^4.17.15",
     "marked": "^0.8.2",
     "mermaid": "^8.5.0",
@@ -60,16 +60,16 @@
     "multer": "^1.4.2",
     "normalize-path": "^3.0.0",
     "octicons": "^4.4.0",
-    "open": "^7.0.3",
+    "open": "^8.2.1",
     "pug": "^3.0.0",
     "recursive-readdir": "^2.2.2",
     "remove-markdown": "^0.3.0",
     "shortid": "^2.2.15",
     "string-humanize": "^1.0.1",
-    "yargs": "^16.2.0"
+    "yargs": "^17.1.1"
   },
   "devDependencies": {
-    "eslint": "^6.8.0",
+    "eslint": "^7.32.0",
     "eslint-config-xo-space": "^0.24.0",
     "semantic-release": "^17.3.1",
     "semantic-release-npm-github": "^1.0.4"
