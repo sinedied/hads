@@ -2,7 +2,6 @@
 
 const fs = require('fs-extra');
 const path = require('path');
-const optimist = require('optimist');
 const express = require('express');
 const multer = require('multer');
 const bodyParser = require('body-parser');
@@ -16,30 +15,43 @@ const Renderer = require('./lib/renderer.js');
 const Helpers = require('./lib/helpers.js');
 const Indexer = require('./lib/indexer.js');
 
-const args = optimist
+const yargs = require('yargs/yargs')(process.argv.slice(2))
   .usage(`\n${pkg.name} ${pkg.version}\nUsage: $0 [root dir] [options]`)
-  .alias('p', 'port')
-  .describe('p', 'Port number to listen on')
-  .default('p', 4040)
-  .alias('h', 'host')
-  .describe('h', 'Host address to bind to')
-  .default('h', 'localhost')
-  .alias('i', 'images-dir')
-  .describe('i', 'Directory to store images')
-  .default('i', 'images')
-  .alias('o', 'open')
-  .boolean('o')
-  .describe('o', 'Open default browser on start')
-  .alias('r', 'readonly')
-  .boolean('r')
-  .describe('r', 'Read-only mode (no add or edit feature)')
-  .alias('e', 'export')
-  .describe('e', 'Export static html')
-  .describe('help', 'Show this help')
-  .argv;
+  .version(false)
+  .option('port', {
+    alias: 'p',
+    describe: 'Port number to listen on',
+    default: 4040
+  })
+  .option('host', {
+    alias: 'h',
+    describe: 'Host address to bind to',
+    default: 'localhost'
+  })
+  .option('images-dir', {
+    alias: 'i',
+    describe: 'Directory to store images',
+    default: 'images'
+  })
+  .option('open', {
+    alias: 'o',
+    describe: 'Open default browser on start'
+  })
+  .option('readonly', {
+    alias: 'r',
+    describe: 'Read-only mode (no add or edit feature)'
+  })
+  .option('export', {
+    alias: 'e',
+    describe: 'Export static html'
+  })
+  .help(false) // Needed to avoid extra [boolean] type
+  .option('help', {describe: 'Show this help'});
+
+const args = yargs.argv;
 
 if (args.help || args._.length > 1) {
-  optimist.showHelp(console.log);
+  yargs.showHelp(console.log);
   process.exit();
 }
 

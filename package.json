@@ -62,12 +62,12 @@
     "normalize-path": "^3.0.0",
     "octicons": "^4.4.0",
     "open": "^7.0.3",
-    "optimist": "^0.6.1",
     "pug": "^3.0.0",
     "recursive-readdir": "^2.2.2",
     "remove-markdown": "^0.3.0",
     "shortid": "^2.2.15",
-    "string-humanize": "^1.0.1"
+    "string-humanize": "^1.0.1",
+    "yargs": "^16.2.0"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
