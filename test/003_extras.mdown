@@ -124,7 +124,7 @@ gantt
 ```mermaid
 graph TD;
     A((A))-->B(B);
-    A-->C[click me];
+    A-->C["click me"];
     B-->D[fa:fa-chrome test icon];
     C-->D;
 click C "https://mermaidjs.github.io/demos.html" "Mermaid demos"
@@ -134,7 +134,7 @@ Source:
 ```
 graph TD;
     A((A))-->B(B);
-    A-->C[click me];
+    A-->C["click me"];
     B-->D[fa:fa-chrome test icon];
     C-->D;
 click C "https://mermaidjs.github.io/demos.html" "Mermaid demos"
