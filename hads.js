@@ -4,7 +4,6 @@ const fs = require('fs-extra');
 const path = require('path');
 const express = require('express');
 const multer = require('multer');
-const bodyParser = require('body-parser');
 const shortId = require('shortid');
 const moment = require('moment');
 const pkg = require('./package.json');
@@ -191,8 +190,8 @@ if (args.export) {
 const app = express();
 app.set('views', PATHS.views);
 app.set('view engine', 'pug');
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
+app.use(express.json());
+app.use(express.urlencoded({
   extended: true
 }));
 app.use('/_hads/', express.static(path.join(__dirname, '/public')));
