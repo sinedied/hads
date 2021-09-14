@@ -1,6 +1,6 @@
 {
   "name": "hads",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Fast web server allowing to browse, search and edit project documentation written in Markdown",
   "repository": {
     "type": "git",

@@ -1,3 +1,11 @@
+## [3.0.1](https://github.com/sinedied/hads/compare/3.0.0...3.0.1) (2021-09-14)
+
+
+### Bug Fixes
+
+* remove highlight warning ([e9fd47e](https://github.com/sinedied/hads/commit/e9fd47e204aadc54fb4d53a7bdb0e44957ccd8e7))
+* use yargs instead of optimist (fixes [#65](https://github.com/sinedied/hads/issues/65)) ([d311d00](https://github.com/sinedied/hads/commit/d311d005d2c20e8fd2cc37cc48ed3f2f56988a06))
+
 # [3.0.0](https://github.com/sinedied/hads/compare/2.1.0...3.0.0) (2021-01-11)
 
 
