@@ -417,4 +417,4 @@ indexer.indexFiles().then(() => {
   });
 });
 
-exports = app;
+module.exports = app;
