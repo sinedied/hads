@@ -1,3 +1,10 @@
+## [3.0.3](https://github.com/sinedied/hads/compare/3.0.2...3.0.3) (2022-05-02)
+
+
+### Bug Fixes
+
+* display accented characters properly in index (fixes [#73](https://github.com/sinedied/hads/issues/73)) ([8d9c402](https://github.com/sinedied/hads/commit/8d9c402fdb8c2ea27f7eee4f549a3889b3f04fd6))
+
 ## [3.0.2](https://github.com/sinedied/hads/compare/3.0.1...3.0.2) (2021-10-15)
 
 ## [3.0.1](https://github.com/sinedied/hads/compare/3.0.0...3.0.1) (2021-09-14)
