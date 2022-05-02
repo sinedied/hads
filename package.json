@@ -53,6 +53,7 @@
     "fs-extra": "^10.0.0",
     "globby": "^11.0.0",
     "highlight.js": "^11.2.0",
+    "humanize-string": "^2.1.0",
     "lodash": "^4.17.15",
     "marked": "^3.0.3",
     "mermaid": "^9.0.1",
@@ -63,9 +64,8 @@
     "open": "^8.2.1",
     "pug": "^3.0.0",
     "recursive-readdir": "^2.2.2",
-    "remove-markdown": "^0.3.0",
+    "remove-markdown": "^0.5.0",
     "shortid": "^2.2.15",
-    "string-humanize": "^1.0.1",
     "yargs": "^17.1.1"
   },
   "devDependencies": {
